@@ -41,7 +41,6 @@ public class AlbumServiceImpl implements AlbumService {
 
 	private static final String YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION = "You don't have permission to make this operation";
 
-
 	private final AlbumRepository albumRepository;
 
 	private final UserRepository userRepository;
@@ -68,7 +67,7 @@ public class AlbumServiceImpl implements AlbumService {
 	}
 
 	@Override
-	public ResponseEntity<Album> addAlbum(AlbumRequest albumRequest, UserPrincipal currentUser) {
+	public Album addAlbum(AlbumRequest albumRequest, UserPrincipal currentUser) {
 		User user = userRepository.getUser(currentUser);
 
 		Album album = new Album();
@@ -77,17 +76,17 @@ public class AlbumServiceImpl implements AlbumService {
 
 		album.setUser(user);
 		Album newAlbum = albumRepository.save(album);
-		return new ResponseEntity<>(newAlbum, HttpStatus.CREATED);
+		return newAlbum;
 	}
 
 	@Override
-	public ResponseEntity<Album> getAlbum(Long id) {
+	public Album getAlbum(Long id) {
 		Album album = albumRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ALBUM_STR, ID, id));
-		return new ResponseEntity<>(album, HttpStatus.OK);
+		return  album;
 	}
 
 	@Override
-	public ResponseEntity<AlbumResponse> updateAlbum(Long id, AlbumRequest newAlbum, UserPrincipal currentUser) {
+	public AlbumResponse updateAlbum(Long id, AlbumRequest newAlbum, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ALBUM_STR, ID, id));
 		User user = userRepository.getUser(currentUser);
 		if (album.getUser().getId().equals(user.getId()) || currentUser.getAuthorities()
@@ -99,25 +98,23 @@ public class AlbumServiceImpl implements AlbumService {
 
 			modelMapper.map(updatedAlbum, albumResponse);
 
-			return new ResponseEntity<>(albumResponse, HttpStatus.OK);
+			return albumResponse;
 		}
 
 		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);
 	}
-
 	@Override
-	public ResponseEntity<ApiResponse> deleteAlbum(Long id, UserPrincipal currentUser) {
+	public ApiResponse deleteAlbum(Long id, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ALBUM_STR, ID, id));
 		User user = userRepository.getUser(currentUser);
 		if (album.getUser().getId().equals(user.getId()) || currentUser.getAuthorities()
 				.contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString()))) {
 			albumRepository.deleteById(id);
-			return new ResponseEntity<>(new ApiResponse(Boolean.TRUE, "You successfully deleted album"), HttpStatus.OK);
+			return new ApiResponse(Boolean.TRUE, "You successfully deleted album");
 		}
 
 		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);
 	}
-
 	@Override
 	public PagedResponse<Album> getUserAlbums(String username, int page, int size) {
 		User user = userRepository.getUserByName(username);
