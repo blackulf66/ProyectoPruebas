@@ -60,4 +60,30 @@ class AlbumServiceImplTest {
         assertEquals(result, albumService.getAllAlbums(0 , 1));
 
     }
+
+    @Test
+    void test_addAllAlbumService() {
+
+        User user = new User();
+        user.setUsername("user");
+        user.setId(1L);
+
+        Album album = new Album();
+        album.setTitle("El album");
+        album.setUser(user);
+
+        Page<Album> pageResult = new PageImpl<>(Arrays.asList(album));
+        PagedResponse<Album> result = new PagedResponse<>();
+
+        result.setContent(pageResult.getContent());
+        result.setTotalPages(1);
+        result.setTotalElements(1);
+        result.setLast(true);
+        result.setSize(1);
+
+        when(albumRepository.findByCreatedBy(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
+
+        assertEquals(result, albumService.addAlbum(albumRequest, user));
+
+    }
 }
