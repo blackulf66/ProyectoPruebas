@@ -68,7 +68,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void test_getCategory(){
+    void test_getCategorySuccess(){
 
         Category cat1 = new Category("dummy_category");
 
@@ -76,9 +76,9 @@ public class CategoryServiceImplTest {
 
         categoryRepository.save(cat1);
 
-        when(categoryRepository.findById(1L).orElse(null)).thenReturn(cat1);
+        when(categoryRepository.getById(1L)).thenReturn(cat1);
 
-        assertEquals(cat1, categoryRepository.findById(1L).orElse(null));
+        assertEquals(cat1, categoryRepository.getById(1L));
 
 
     }
