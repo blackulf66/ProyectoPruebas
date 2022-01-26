@@ -56,36 +56,36 @@ public class AlbumController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<Album> addAlbum(@Valid @RequestBody AlbumRequest albumRequest, @CurrentUser UserPrincipal currentUser) {
+	public Album addAlbum(@Valid @RequestBody AlbumRequest albumRequest, @CurrentUser UserPrincipal currentUser) {
 		return albumService.addAlbum(albumRequest, currentUser);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Album> getAlbum(@PathVariable(name = "id") Long id) {
+	public Album getAlbum(@PathVariable(name = "id") Long id) {
 		return albumService.getAlbum(id);
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public ResponseEntity<AlbumResponse> updateAlbum(@PathVariable(name = "id") Long id, @Valid @RequestBody AlbumRequest newAlbum,
+	public AlbumResponse updateAlbum(@PathVariable(name = "id") Long id, @Valid @RequestBody AlbumRequest newAlbum,
 			@CurrentUser UserPrincipal currentUser) {
 		return albumService.updateAlbum(id, newAlbum, currentUser);
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public ResponseEntity<ApiResponse> deleteAlbum(@PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
+	public ApiResponse deleteAlbum(@PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
 		return albumService.deleteAlbum(id, currentUser);
 	}
 
 	@GetMapping("/{id}/photos")
-	public ResponseEntity<PagedResponse<PhotoResponse>> getAllPhotosByAlbum(@PathVariable(name = "id") Long id,
+	public PagedResponse<PhotoResponse> getAllPhotosByAlbum(@PathVariable(name = "id") Long id,
 			@RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
 			@RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size) {
 
 		PagedResponse<PhotoResponse> response = photoService.getAllPhotosByAlbum(id, page, size);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return response;
 	}
 
 }
