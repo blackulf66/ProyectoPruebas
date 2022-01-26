@@ -9,6 +9,8 @@ import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.service.AlbumService;
 import com.sopromadze.blogapi.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -33,25 +35,23 @@ import static org.mockito.Mockito.when;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AlbumServiceImplTest {
 
+    @InjectMocks
+    private AlbumServiceImpl albumService;
 
-    private AlbumService albumService;
-
-    private Album album;
+     Album album;
+    @Mock
     private AlbumResponse albumResponse;
-    
+    @Mock
     private final ModelMapper modelMapper;
-    @Autowired
-    private AlbumRepository albumRepository;
-
-
-    private UserService userService;
-
-
-    private UserRepository userRepository;
-
     AlbumServiceImplTest() {
         modelMapper = null;
     }
+    @Mock
+    private AlbumRepository albumRepository;
+    @Mock
+    private UserService userService;
+
+    private UserRepository userRepository;
 
     @Test
     void test_getAllAlbumsService() {
@@ -65,30 +65,31 @@ class AlbumServiceImplTest {
         album.setCreatedAt(Instant.now());
         album.setUpdatedAt(Instant.now());
 
-        List<AlbumResponse> data2 = Arrays.asList(albumResponse);
-        Page<Album> data = new PageImpl<>(Arrays.asList(album));
+        Page<Album> pageResult = new PageImpl<>(Arrays.asList(album));
+        Page<Album> pageResult2 = new PageImpl(Arrays.asList(albumResponse));
 
-        PagedResponse<AlbumResponse> result = new PagedResponse<>();
+        PagedResponse<Album> result = new PagedResponse<>();
 
-        result.setContent(data2);
+        result.setContent(pageResult2.getContent());
         result.setTotalPages(1);
         result.setTotalElements(1);
         result.setLast(true);
         result.setSize(1);
 
         List<Album> albums = new ArrayList<>();
-        albums.add(album);
-        AlbumResponse [] albumResponses = {albumResponse};
 
-        when(albumRepository.findAll(any(Pageable.class))).thenReturn(data);
-        when(modelMapper.map(data.getContent(), AlbumResponse[].class)).thenReturn(albumResponses);
+        AlbumResponse [] albumResponses = {albumResponse};
+        albums.add(album);
+
+        when(albumRepository.findAll(any(Pageable.class))).thenReturn(pageResult);
+        when(modelMapper.map(pageResult.getContent(), AlbumResponse[].class)).thenReturn(albumResponses);
 
         assertEquals(result, albumService.getAllAlbums(1,1));
 
     }
 
    /* @Test
-    void test_addAllAlbumService1() {
+    void test_addAlbumService1() {
 
         User user = new User();
         user.setUsername("user");
