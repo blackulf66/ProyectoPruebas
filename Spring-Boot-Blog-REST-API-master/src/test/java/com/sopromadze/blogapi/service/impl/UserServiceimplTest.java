@@ -155,6 +155,19 @@ public class UserServiceimplTest {
         Company company = new Company();
         company.setName("MacDonald");
 
+
+
+        List<Role> roles = new ArrayList<>();
+
+        Role roleUser = new Role();
+        roleUser.setName(RoleName.ROLE_USER);
+        Role roleAdmin = new Role();
+        roleAdmin.setName(RoleName.ROLE_ADMIN);
+        List<Role> rolesUser = new ArrayList<>();
+
+        rolesUser.add(roleUser);
+
+
         User usuario = new User();
         usuario.setFirstName("manuel");
         usuario.setUsername("manspitub");
@@ -163,6 +176,21 @@ public class UserServiceimplTest {
         usuario.setAddress(address);
         usuario.setCompany(company);
         usuario.setPhone("459403477");
+        usuario.setRoles(rolesUser);
+
+        roles.add(roleAdmin);
+        roles.add(roleUser);
+
+
+
+        User savedUser = userRepository.save(usuario);
+
+        usuario.setRoles(roles);
+
+        assertTrue();
+        lenient().when(usuario.getRoles()).thenReturn();
+
+
 
     }
 
