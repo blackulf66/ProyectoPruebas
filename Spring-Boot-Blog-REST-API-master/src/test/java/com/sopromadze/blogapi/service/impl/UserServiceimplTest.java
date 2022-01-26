@@ -82,7 +82,7 @@ public class UserServiceimplTest {
 
 
 
-        User user = new User("rafalito");
+        User user = new User();
         user.setId(8L);
         user.setFirstName("rafael");
         user.setLastName("Perez");
@@ -142,6 +142,27 @@ public class UserServiceimplTest {
 
         assertEquals(user, userService.addUser(user));
 
+
+    }
+
+    @Test
+    void giveAdminTestSuccess(){
+
+
+        Address address = new Address();
+        address.setCity("Sevilla");
+        address.setStreet("Calle Condes de Bustillo");
+        Company company = new Company();
+        company.setName("MacDonald");
+
+        User usuario = new User();
+        usuario.setFirstName("manuel");
+        usuario.setUsername("manspitub");
+        usuario.setLastName("spinola");
+        usuario.setEmail("manspitub@@hotmail.com");
+        usuario.setAddress(address);
+        usuario.setCompany(company);
+        usuario.setPhone("459403477");
 
     }
 
