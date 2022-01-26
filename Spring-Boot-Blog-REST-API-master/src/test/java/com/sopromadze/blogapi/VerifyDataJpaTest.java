@@ -1,7 +1,10 @@
 package com.sopromadze.blogapi;
 
 import com.sopromadze.blogapi.model.Album;
+import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.repository.AlbumRepository;
+import com.sopromadze.blogapi.security.UserPrincipal;
+import com.sopromadze.blogapi.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -13,6 +16,9 @@ import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -44,6 +50,7 @@ public class VerifyDataJpaTest {
 
 
     }
+
 
 
 }

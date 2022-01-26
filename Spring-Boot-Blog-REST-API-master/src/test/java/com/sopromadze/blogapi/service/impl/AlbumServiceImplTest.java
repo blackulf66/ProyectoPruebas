@@ -1,6 +1,7 @@
 package com.sopromadze.blogapi.service.impl;
 
 import com.sopromadze.blogapi.model.Album;
+import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
@@ -31,7 +32,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -149,6 +151,24 @@ class AlbumServiceImplTest {
             UserPrincipal user1 = Mockito.mock(UserPrincipal.class);
             when(albumService.addAlbum(albumRequest,user1)).thenReturn(album2);
             assertEquals(album2, albumService.addAlbum(albumRequest,user1));
+
+    }
+
+    @Test
+    void test_deletedAlbum_Success(){
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        albumRepository.save(album);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deleteAlbum(1L,user_prueba);
+
+        verify(albumService1, times(1)).deleteAlbum(1L, user_prueba);
 
     }
 }
