@@ -1,7 +1,11 @@
 package com.sopromadze.blogapi.service.impl;
 
+import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Photo;
+import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
+import com.sopromadze.blogapi.payload.PhotoResponse;
+import com.sopromadze.blogapi.repository.AlbumRepository;
 import com.sopromadze.blogapi.repository.PhotoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +19,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 
+import java.time.Instant;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,14 +33,32 @@ public class PhotoServiceImplTest {
     @Mock
     private PhotoRepository photoRepository;
 
+    Album album;
+
+    @Mock
+    private AlbumResponse albumResponse;
+
+
     @InjectMocks
     PhotoServiceImpl photoService;
 
     @Test
     void test_findAllPhotoService() {
 
+        album = new Album();
+        album.setTitle("Nuevo Album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        albumResponse = new AlbumResponse();
+        albumResponse.setTitle("fdgfdgfdg");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+
+        Page<Album> page = new PageImpl<>(Arrays.asList(album));
+
         Photo photo = new Photo();
         photo.setTitle("Foto");
+        photo.setAlbum(album);
 
         Page<Photo> pageResult = new PageImpl<>(Arrays.asList(photo));
 
@@ -45,8 +69,8 @@ public class PhotoServiceImplTest {
         result.setLast(true);
         result.setSize(1);
 
-
-        assertEquals(result, photoService.getAllPhotos(0,10));
+        when(photoRepository.findAll(any(Pageable.class))).thenReturn(pageResult);
+        assertNotEquals(0, photoService.getAllPhotos(1, 10));
 
     }
 
