@@ -109,7 +109,10 @@ public class CategoryServiceImplTest {
         cat1.setId(1L);
         categoryRepository.save(cat1);
 
-        doNothing().when();
+        doNothing().when(catService).deleteCategory(isA(Long.class),isA(UserPrincipal.class));
+        catService.deleteCategory(1L,user_prueba);
+
+        verify(catService, times(1)).deleteCategory(1L, user_prueba);
 
     }
 }
