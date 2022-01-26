@@ -18,9 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +40,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
+@DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserServiceimplTest {
 
     @Mock
@@ -53,7 +60,7 @@ public class UserServiceimplTest {
     Role role;
 
 
-    User user;
+
 
 
     RoleName roleName;
@@ -75,9 +82,8 @@ public class UserServiceimplTest {
 
 
 
-        user =new User();
+        User user = new User("rafalito");
         user.setId(8L);
-        user.setUsername("rafalito");
         user.setFirstName("rafael");
         user.setLastName("Perez");
         user.setPhone("348936200");
@@ -86,6 +92,8 @@ public class UserServiceimplTest {
         user.setCreatedAt(Instant.now());
         user.setWebsite("salesianos.com");
         user.setEmail("rafalito@gmail.com");
+
+        userRepository.save(user);
 
         Long postCount = postRepository.countByCreatedBy(user.getId());
 

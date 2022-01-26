@@ -119,6 +119,10 @@ public class User extends DateAudit {
 		this.password = password;
 	}
 
+	public User(String firstName) {
+		super();
+		this.firstName= firstName;
+	}
 
 
 	public List<Todo> getTodos() {
