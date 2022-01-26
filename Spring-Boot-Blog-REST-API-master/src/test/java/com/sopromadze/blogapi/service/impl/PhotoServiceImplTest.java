@@ -4,16 +4,20 @@ import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Photo;
 import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
+import com.sopromadze.blogapi.payload.PhotoRequest;
 import com.sopromadze.blogapi.payload.PhotoResponse;
 import com.sopromadze.blogapi.repository.AlbumRepository;
 import com.sopromadze.blogapi.repository.PhotoRepository;
+import com.sopromadze.blogapi.security.UserPrincipal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +29,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -39,7 +43,11 @@ public class PhotoServiceImplTest {
     @Mock
     private AlbumResponse albumResponse;
 
-
+    @Mock
+    private final ModelMapper modelMapper;
+    PhotoServiceImplTest() {
+        modelMapper = null;
+    }
 
     @InjectMocks
     PhotoServiceImpl photoService;
@@ -135,6 +143,46 @@ public class PhotoServiceImplTest {
 
         when(photoRepository.findByAlbumId(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
         assertEquals(result, photoService.getAllPhotosByAlbum(2L,1,10));
+    }
+
+   /* @Test
+    void Test_addAlbumService(){
+
+        PhotoRequest photoRequest = new PhotoRequest();
+        photoRequest.setAlbumId(album.getId());
+        photoRequest.setTitle("Foto de la playa");
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        modelMapper.map(photoRequest, photo);
+
+        UserPrincipal userPrincipal = Mockito.mock(UserPrincipal.class);
+        when(photoService.addPhoto(photoRequest,userPrincipal)).thenReturn(photo);
+        assertEquals(photo, photoService.addPhoto(photoRequest,userPrincipal));
+
+    }
+
+    */
+    @Test
+    void test_deletedAlbum_Success(){
+
+        PhotoServiceImpl albumService1 = mock(PhotoServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+        photoRepository.save(photo);
+
+        doNothing().when(photoService).deletePhoto(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deletePhoto(1L,user_prueba);
+
+        verify(albumService1, times(1)).deletePhoto(1L, user_prueba);
+
     }
 
 }
