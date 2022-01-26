@@ -4,13 +4,16 @@ import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
+import com.sopromadze.blogapi.payload.request.AlbumRequest;
 import com.sopromadze.blogapi.repository.AlbumRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
+import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.AlbumService;
 import com.sopromadze.blogapi.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -38,32 +41,27 @@ class AlbumServiceImplTest {
     @InjectMocks
     private AlbumServiceImpl albumService;
 
-     Album album;
-    @Mock
-    private AlbumResponse albumResponse;
     @Mock
     private final ModelMapper modelMapper;
     AlbumServiceImplTest() {
         modelMapper = null;
     }
+
     @Mock
     private AlbumRepository albumRepository;
     @Mock
     private UserService userService;
-
+    @Mock
     private UserRepository userRepository;
 
     @Test
     void test_getAllAlbumsService() {
 
-        album = new Album();
+        Album album = new Album();
         album.setTitle("dasdsad");
-        album.setCreatedAt(Instant.now());
-        album.setUpdatedAt(Instant.now());
-        albumResponse = new AlbumResponse();
+
+        AlbumResponse albumResponse = new AlbumResponse();
         albumResponse.setTitle("fdgfdgfdg");
-        album.setCreatedAt(Instant.now());
-        album.setUpdatedAt(Instant.now());
 
         Page<Album> pageResult = new PageImpl<>(Arrays.asList(album));
         Page<Album> pageResult2 = new PageImpl(Arrays.asList(albumResponse));
@@ -88,8 +86,8 @@ class AlbumServiceImplTest {
 
     }
 
-   /* @Test
-    void test_addAlbumService1() {
+   @Test
+    void test_getUserAlbumService() {
 
         User user = new User();
         user.setUsername("user");
@@ -108,9 +106,49 @@ class AlbumServiceImplTest {
         result.setLast(true);
         result.setSize(1);
 
-        when(albumRepository.findByCreatedBy(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
+       when(userRepository.getUserByName("user")).thenReturn(user);
+       when(albumRepository.findByCreatedBy(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
+       assertEquals(result, albumService.getUserAlbums("user", 0, 10));
 
-        assertEquals(result, albumService.addAlbum(albumRequest, user));
+    }
+    @Test
+    void Test_getAlbumService_succes(){
 
-    }*/
+             Album album = new Album();
+             album.setTitle("El album");
+             album.setId(1L);
+
+             when(albumRepository.getById(1L)).thenReturn(album);
+
+             assertEquals(album, albumRepository.getById(1L));
+    }
+
+    @Test
+    void Test_getAlbumService_fail(){
+
+        Album album = new Album();
+        album.setTitle("El album");
+        album.setId(2L);
+
+        when(albumRepository.getById(2L)).thenReturn(album);
+
+        assertEquals(album, albumRepository.getById(1L));
+    }
+
+    @Test
+    void Test_addAlbumService(){
+
+            AlbumRequest albumRequest = new AlbumRequest();
+            albumRequest.setTitle("El album");
+            albumRequest.setId(1L);
+
+            Album album2 = new Album();
+
+            modelMapper.map(albumRequest, album2);
+
+            UserPrincipal user1 = Mockito.mock(UserPrincipal.class);
+            when(albumService.addAlbum(albumRequest,user1)).thenReturn(album2);
+            assertEquals(album2, albumService.addAlbum(albumRequest,user1));
+
+    }
 }
