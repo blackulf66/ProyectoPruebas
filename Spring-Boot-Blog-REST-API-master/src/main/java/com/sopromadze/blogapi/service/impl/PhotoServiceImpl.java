@@ -41,6 +41,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 	private final AlbumRepository albumRepository;
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PagedResponse<PhotoResponse> getAllPhotos(int page, int size) {
 		AppUtils.validatePageNumberAndSize(page, size);
@@ -63,6 +64,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PhotoResponse getPhoto(Long id) {
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
@@ -122,6 +124,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
+	//TODO Haciendose por Alfonso
 	@Override
 	public PagedResponse<PhotoResponse> getAllPhotosByAlbum(Long albumId, int page, int size) {
 		AppUtils.validatePageNumberAndSize(page, size);

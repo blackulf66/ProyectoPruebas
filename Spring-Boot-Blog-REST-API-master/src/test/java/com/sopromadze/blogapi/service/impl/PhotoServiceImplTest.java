@@ -21,6 +21,7 @@ import org.springframework.security.core.parameters.P;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +40,7 @@ public class PhotoServiceImplTest {
     private AlbumResponse albumResponse;
 
 
+
     @InjectMocks
     PhotoServiceImpl photoService;
 
@@ -50,7 +52,7 @@ public class PhotoServiceImplTest {
         album.setCreatedAt(Instant.now());
         album.setUpdatedAt(Instant.now());
         albumResponse = new AlbumResponse();
-        albumResponse.setTitle("fdgfdgfdg");
+        albumResponse.setTitle("El album");
         album.setCreatedAt(Instant.now());
         album.setUpdatedAt(Instant.now());
 
@@ -70,8 +72,69 @@ public class PhotoServiceImplTest {
         result.setSize(1);
 
         when(photoRepository.findAll(any(Pageable.class))).thenReturn(pageResult);
-        assertNotEquals(0, photoService.getAllPhotos(1, 10));
+        assertNotEquals(0, photoService.getAllPhotos(1, 10).getSize());
 
+    }
+
+    @Test
+    void test_getPhotoService(){
+
+        album = new Album();
+        album.setTitle("Nuevo Album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        albumResponse = new AlbumResponse();
+        albumResponse.setTitle("el album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+
+        Page<Album> page = new PageImpl<>(Arrays.asList(album));
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        PhotoResponse photoResponse = new PhotoResponse(1L, "Foto", null, null, album.getId());
+
+
+
+        when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
+        assertEquals(photoResponse, photoService.getPhoto(1L));
+
+    }
+
+    @Test
+    void test_getAllPhotosByAlbumService () {
+
+        album = new Album();
+        album.setId(2L);
+        album.setTitle("Nuevo Album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        albumResponse = new AlbumResponse();
+        albumResponse.setTitle("el album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+
+        Page<Album> page = new PageImpl<>(Arrays.asList(album));
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        Page<Photo> pageResult = new PageImpl<>(Arrays.asList(photo));
+
+        PagedResponse<Photo> result = new PagedResponse<>();
+        result.setContent(pageResult.getContent());
+        result.setTotalPages(1);
+        result.setTotalElements(1);
+        result.setLast(true);
+        result.setSize(1);
+
+        when(photoRepository.findByAlbumId(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
+        assertEquals(result, photoService.getAllPhotosByAlbum(2L,1,10));
     }
 
 }
