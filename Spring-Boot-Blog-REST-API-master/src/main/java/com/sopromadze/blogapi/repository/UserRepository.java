@@ -4,12 +4,14 @@ import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Optional;
 
 @Repository
+@Component
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUsername(@NotBlank String username);
 
