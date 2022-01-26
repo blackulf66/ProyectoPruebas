@@ -110,9 +110,7 @@ public class AlbumServiceImpl implements AlbumService {
 		if (album.getUser().getId().equals(user.getId()) || currentUser.getAuthorities()
 				.contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString()))) {
 			albumRepository.deleteById(id);
-
 		}
-
 		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);
 	}
 	@Override

@@ -145,6 +145,8 @@ class AlbumServiceImplTest {
             albumRequest.setId(1L);
 
             Album album2 = new Album();
+            album2.setId(2L);
+            album2.setTitle("ejhdfsifjsd");
 
             modelMapper.map(albumRequest, album2);
 
@@ -153,7 +155,6 @@ class AlbumServiceImplTest {
             assertEquals(album2, albumService.addAlbum(albumRequest,user1));
 
     }
-
     @Test
     void test_deletedAlbum_Success(){
 
