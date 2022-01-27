@@ -35,17 +35,49 @@ class CommentRepositoryTest {
     void test_NotNull(){ assertNotNull(CommentRepository);}
 
     @Test
-    void test_commentRepository() {
+    void test_commentRepository_success() {
 
         Comment comment = new Comment();
         comment.setName("felicia hardy");
         comment.setEmail("elemail@gmail.com");
         comment.setBody("dsfghjidfsoihusdfo");
-
+        comment.setUpdatedAt(Instant.now());
         comment.setCreatedAt(Instant.now());
+
         testEntityManager.persist(comment);
 
         Post post = new Post();
+        post.setBody("sdfsadsad");
+        post.setUpdatedAt(Instant.now());
+        post.setCreatedAt(Instant.now());
+
+
+        testEntityManager.persist(post);
+
+        Page<Comment> comments = new PageImpl<>(Arrays.asList(comment));
+        PageRequest pageRequest = PageRequest.of(1, 2);
+
+        assertEquals(0, CommentRepository.findByPostId(post.getId(), pageRequest).getTotalElements());
+
+    }
+
+    @Test
+    void test_commentRepository_fail() {
+
+        Comment comment = new Comment();
+        comment.setName("felicia hardy");
+        comment.setEmail("elemail@gmail.com");
+        comment.setBody("dsfghjidfsoihusdfo");
+        comment.setUpdatedAt(Instant.now());
+        comment.setCreatedAt(Instant.now());
+
+        testEntityManager.persist(comment);
+
+        Post post = new Post();
+        post.setBody("sdfsadsad");
+        post.setUpdatedAt(Instant.now());
+        post.setCreatedAt(Instant.now());
+
 
         testEntityManager.persist(post);
 

@@ -172,4 +172,22 @@ class AlbumServiceImplTest {
         verify(albumService1, times(1)).deleteAlbum(1L, user_prueba);
 
     }
+
+    @Test
+    void test_deletedAlbum_fail(){
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        albumRepository.save(album);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deleteAlbum(1L,user_prueba);
+
+        verify(albumService1, times(1)).deleteAlbum(2L, user_prueba);
+
+    }
 }
