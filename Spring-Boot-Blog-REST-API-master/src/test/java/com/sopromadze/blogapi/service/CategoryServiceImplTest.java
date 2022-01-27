@@ -131,17 +131,23 @@ public class CategoryServiceImplTest {
                 user1.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList()));
 
-        Category cat_original = new Category("dummy_category");
-        cat_original.setId(1L);
-        cat_original.setCreatedBy(1L);
+        Category cat1 = new Category("dummy_category");
+        cat1.setId(1L);
+        cat1.setCreatedBy(1L);
+        when(categoryRepository.save(cat1)).thenReturn(cat1);
 
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat_original));
+        Category cat2 = new Category("dummy_category changed");
+        cat1.setCreatedBy(1L);
 
-        Category cat_result = new Category("dummy category edited");
-        cat_result.setId(cat_original.getId());
-        cat_original.setCreatedBy(1L);
 
-        assertEquals(cat_result,categoryService.updateCategory(cat_original.getId(),cat_result,user_prueba));
+        when(categoryRepository.save(cat2)).thenReturn(cat2);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
+        cat1.setName(cat2.getName());
+
+        when(categoryRepository.save(cat1)).thenReturn(cat1);
+
+        assertEquals(cat1,categoryService.updateCategory(1L,cat2,user_prueba));
     }
 
 
