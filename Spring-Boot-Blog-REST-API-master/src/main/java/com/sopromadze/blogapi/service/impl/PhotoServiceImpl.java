@@ -110,6 +110,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public ApiResponse deletePhoto(Long id, UserPrincipal currentUser) {
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
@@ -124,7 +125,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
-	//TODO Haciendose por Alfonso
+	//TODO Hecho por Alfonso
 	@Override
 	public PagedResponse<PhotoResponse> getAllPhotosByAlbum(Long albumId, int page, int size) {
 		AppUtils.validatePageNumberAndSize(page, size);

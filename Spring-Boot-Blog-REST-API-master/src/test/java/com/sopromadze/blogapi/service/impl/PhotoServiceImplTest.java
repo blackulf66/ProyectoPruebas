@@ -41,7 +41,13 @@ public class PhotoServiceImplTest {
     Album album;
 
     @Mock
+    private AlbumRepository albumRepository;
+
+    @Mock
     private AlbumResponse albumResponse;
+
+    @Mock
+    private UserPrincipal userPrincipal;
 
     @Mock
     private final ModelMapper modelMapper;
@@ -125,7 +131,70 @@ public class PhotoServiceImplTest {
         album.setCreatedAt(Instant.now());
         album.setUpdatedAt(Instant.now());
 
-        Page<Album> page = new PageImpl<>(Arrays.asList(album));
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        Page<Photo> pageResult = new PageImpl<>(Arrays.asList(photo));
+
+        PagedResponse<Photo> result = new PagedResponse<>();
+        result.setContent(pageResult.getContent());
+        result.setTotalPages(1);
+        result.setTotalElements(1);
+        result.setLast(true);
+        result.setSize(1);
+
+        PhotoResponse photoResponse = new PhotoResponse(1L, "Foto", null, null, album.getId());
+
+        Page<PhotoResponse> pageResult1 = new PageImpl<PhotoResponse>(Arrays.asList(photoResponse));
+
+        PagedResponse<PhotoResponse> result1 = new PagedResponse<>();
+        result1.setContent(pageResult1.getContent());
+        result1.setTotalPages(1);
+        result1.setTotalElements(1);
+        result1.setLast(true);
+        result1.setSize(1);
+
+        when(photoRepository.findByAlbumId(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
+        assertEquals(result1, photoService.getAllPhotosByAlbum(2L,1,10));
+    }
+
+   @Test
+    void Test_addAlbumService(){
+
+        album = new Album();
+        album.setId(2L);
+        album.setTitle("Nuevo Album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        albumResponse = new AlbumResponse();
+        albumResponse.setTitle("el album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+
+        PhotoRequest photoRequest = new PhotoRequest();
+        photoRequest.setAlbumId(album.getId());
+        photoRequest.setTitle("Foto de la playa");
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        modelMapper.map(photoRequest, photo);
+
+        when(albumRepository.findById(photoRequest.getAlbumId())).thenReturn(Optional.of(album));
+        //when(photoService.addPhoto(photoRequest,userPrincipal)).thenReturn(photo);
+        assertEquals(photo, photoService.addPhoto(photoRequest,userPrincipal));
+
+    }
+
+
+    @Test
+    void test_deletedPhoto_Success(){
+
+        PhotoServiceImpl photoService = mock(PhotoServiceImpl.class);
 
         Photo photo = new Photo();
         photo.setId(1L);
@@ -141,47 +210,11 @@ public class PhotoServiceImplTest {
         result.setLast(true);
         result.setSize(1);
 
-        when(photoRepository.findByAlbumId(any(Long.class), any(Pageable.class))).thenReturn(pageResult);
-        assertEquals(result, photoService.getAllPhotosByAlbum(2L,1,10));
-    }
 
-   /* @Test
-    void Test_addAlbumService(){
 
-        PhotoRequest photoRequest = new PhotoRequest();
-        photoRequest.setAlbumId(album.getId());
-        photoRequest.setTitle("Foto de la playa");
-
-        Photo photo = new Photo();
-        photo.setId(1L);
-        photo.setTitle("Foto");
-        photo.setAlbum(album);
-
-        modelMapper.map(photoRequest, photo);
-
-        UserPrincipal userPrincipal = Mockito.mock(UserPrincipal.class);
-        when(photoService.addPhoto(photoRequest,userPrincipal)).thenReturn(photo);
-        assertEquals(photo, photoService.addPhoto(photoRequest,userPrincipal));
-
-    }
-
-    */
-    @Test
-    void test_deletedAlbum_Success(){
-
-        PhotoServiceImpl albumService1 = mock(PhotoServiceImpl.class);
-        UserPrincipal user_prueba = mock(UserPrincipal.class);
-
-        Photo photo = new Photo();
-        photo.setId(1L);
-        photo.setTitle("Foto");
-        photo.setAlbum(album);
-        photoRepository.save(photo);
-
-        doNothing().when(photoService).deletePhoto(isA(Long.class),isA(UserPrincipal.class));
-        albumService1.deletePhoto(1L,user_prueba);
-
-        verify(albumService1, times(1)).deletePhoto(1L, user_prueba);
+        when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
+        photoService.deletePhoto(1L,userPrincipal);
+        verify(photoService, times(1)).deletePhoto(1L, userPrincipal);
 
     }
 
