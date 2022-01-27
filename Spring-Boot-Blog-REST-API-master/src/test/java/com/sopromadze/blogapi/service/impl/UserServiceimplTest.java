@@ -12,6 +12,7 @@ import com.sopromadze.blogapi.repository.RoleRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -35,9 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-
+import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -48,12 +52,20 @@ public class UserServiceimplTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    UserService userService;
+
+    @MockBean
+    PasswordEncoder passwordEncoder;
+
+
+
 
 
     @MockBean
     PostRepository postRepository;
 
-    @MockBean
+    @Mock
     RoleRepository roleRepository;
 
     @MockBean
@@ -69,7 +81,7 @@ public class UserServiceimplTest {
     UserPrincipal userPrincipal;
 
     @InjectMocks
-    UserServiceImpl userService;
+    UserServiceImpl service;
 
     @Test
     void getUserProfileTest(){
@@ -95,6 +107,7 @@ public class UserServiceimplTest {
 
         userRepository.save(user);
 
+
         Long postCount = postRepository.countByCreatedBy(user.getId());
 
         UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(),
@@ -114,22 +127,18 @@ public class UserServiceimplTest {
     void whenNewUser_success(){
 
 
-        List <Role> roles = new ArrayList<>();
-        RoleName roleName = RoleName.ROLE_USER;
+
+
         Role role = new Role();
-        role.setName(roleName);
-
-
-         roles.add(role);
-
-
-
         User user = new User();
+        user.setId((1L));
         user.setUsername("albertito");
         user.setEmail("albertito@hotmail.com");
-        user.setRoles(roles);
-        user.setPassword("contrasenia");
-        user.setId(1L);
+
+        List <Role> roles = new ArrayList<>();
+
+        role.setName(RoleName.ROLE_USER);
+        role.setId(1L);
 
 
 
@@ -138,9 +147,21 @@ public class UserServiceimplTest {
 
 
 
-        lenient().when(userRepository.save(user)).thenReturn(user);
 
-        assertEquals(user, userService.addUser(user));
+
+
+
+
+        when(this.userRepository.findByUsername("albertito")).thenReturn(Optional.of(user));
+
+        Optional<User> user1 = this.userRepository.findByUsername("albertito");
+        assertEquals(0, userRepository.count());
+
+
+      // User user1 = this.service.addUser(user);
+
+        //assertNotNull(user1);
+        //assertEquals(1L, user1.getId());
 
 
     }
@@ -164,6 +185,15 @@ public class UserServiceimplTest {
         usuario.setCompany(company);
         usuario.setPhone("459403477");
 
+    }
+
+    @Test
+    void checkThis(){
+        String palabra = "ey que ase";
+
+        assertTrue(palabra.length() ==10);
+        if (palabra.length() ==10 )
+            System.out.println("es verdadero");
     }
 
 
