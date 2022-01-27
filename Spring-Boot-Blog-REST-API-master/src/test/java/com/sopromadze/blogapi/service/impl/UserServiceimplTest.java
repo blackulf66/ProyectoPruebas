@@ -13,6 +13,7 @@ import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -152,16 +153,19 @@ public class UserServiceimplTest {
 
 
 
+
         when(this.userRepository.findByUsername("albertito")).thenReturn(Optional.of(user));
 
-        Optional<User> user1 = this.userRepository.findByUsername("albertito");
-        assertEquals(0, userRepository.count());
+        userRepository.save(user);
 
+        assertTrue(this.userRepository.existsByUsername("albertito"));
 
-      // User user1 = this.service.addUser(user);
+        when(this.userRepository.findByEmail("albertito@hotmail.com")).thenReturn(Optional.of(user));
 
-        //assertNotNull(user1);
-        //assertEquals(1L, user1.getId());
+        userRepository.save(user);
+
+        assertTrue(this.userRepository.existsByUsername("albertito@hotmail.com"));
+
 
 
     }
@@ -208,8 +212,8 @@ public class UserServiceimplTest {
 
         usuario.setRoles(roles);
 
-        assertTrue();
-        lenient().when(usuario.getRoles()).thenReturn();
+//        assertTrue();
+//        lenient().when(usuario.getRoles()).thenReturn();
 
 
 
