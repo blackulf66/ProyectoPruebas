@@ -10,9 +10,13 @@ import com.sopromadze.blogapi.repository.CategoryRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -32,9 +36,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 
-@DataJpaTest
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class CategoryServiceImplTest {
 
     @Mock
@@ -122,7 +126,8 @@ public class CategoryServiceImplTest {
         Category cat1 = new Category("dummy_category");
         cat1.setId(1L);
         cat1.setCreatedBy(1L);
-        categoryRepository.save(cat1);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
 
         Category cat2 = new Category("dummy_category changed");
         cat1.setCreatedBy(1L);
@@ -147,7 +152,7 @@ public class CategoryServiceImplTest {
 
         Category cat1 = new Category("dummy_category");
         cat1.setId(1L);
-        categoryRepository.save(cat1);
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
 
         doNothing().when(catService).deleteCategory(isA(Long.class),isA(UserPrincipal.class));
         catService.deleteCategory(1L,user_prueba);
