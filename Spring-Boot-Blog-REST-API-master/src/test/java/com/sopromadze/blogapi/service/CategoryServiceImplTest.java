@@ -1,6 +1,7 @@
 package com.sopromadze.blogapi.service;
 
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
@@ -99,9 +100,40 @@ public class CategoryServiceImplTest {
 
     @Test
     void test_updateCategoryThrowUnauthorizedException(){
-        UserPrincipal user_prueba = mock(UserPrincipal.class);
-        //when(categoryRepository.updateCategory(usePR)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class,()->categoryService.getCategory(any(Long.class)));
+
+        Role rol = new Role();
+        rol.setName(RoleName.ROLE_ADMIN);
+
+        List<Role> roles = Arrays.asList(rol);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setRoles(roles);
+
+        UserPrincipal user_prueba = new UserPrincipal(user1.getId(),"name","lastName","username","user_prueba@gmail.com","123456789",
+                user1.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList()));
+
+        Category cat1 = new Category("dummy_category");
+        cat1.setId(1L);
+        cat1.setCreatedBy(2L);
+        when(categoryRepository.save(cat1)).thenReturn(cat1);
+
+        Category cat2 = new Category("dummy_category changed");
+        cat1.setCreatedBy(1L);
+
+
+        when(categoryRepository.save(cat2)).thenReturn(cat2);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
+        cat1.setName(cat2.getName());
+
+        when(categoryRepository.save(cat1)).thenReturn(cat1);
+        when(categoryRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(UnauthorizedException.class,()->categoryService.updateCategory(1L,cat2,user_prueba));
+
+
     }
 
     @Test
