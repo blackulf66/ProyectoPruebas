@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class CommentRepositoryTest {
+class CommentRepositoryTestULF {
 
     @Autowired
     private CommentRepository CommentRepository;
