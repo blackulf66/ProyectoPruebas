@@ -10,6 +10,7 @@ import com.sopromadze.blogapi.service.CategoryService;
 import com.sopromadze.blogapi.utils.AppConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,27 +43,27 @@ public class CategoryController {
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category,
 			@CurrentUser UserPrincipal currentUser) {
-
-		return categoryService.addCategory(category, currentUser);
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(category, currentUser));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Category> getCategory(@PathVariable(name = "id") Long id) {
-		return categoryService.getCategory(id);
+		return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategory(id));
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	public ResponseEntity<Category> updateCategory(@PathVariable(name = "id") Long id,
 			@Valid @RequestBody Category category, @CurrentUser UserPrincipal currentUser) throws UnauthorizedException {
-		return categoryService.updateCategory(id, category, currentUser);
+		return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(id, category, currentUser));
+
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> deleteCategory(@PathVariable(name = "id") Long id,
 			@CurrentUser UserPrincipal currentUser) throws UnauthorizedException {
-		return categoryService.deleteCategory(id, currentUser);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }
