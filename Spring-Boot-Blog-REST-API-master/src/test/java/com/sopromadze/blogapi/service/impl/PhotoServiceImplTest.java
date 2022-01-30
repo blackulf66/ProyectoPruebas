@@ -2,6 +2,9 @@ package com.sopromadze.blogapi.service.impl;
 
 import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Photo;
+import com.sopromadze.blogapi.model.role.Role;
+import com.sopromadze.blogapi.model.role.RoleName;
+import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.payload.PhotoRequest;
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -21,10 +23,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -163,6 +166,14 @@ public class PhotoServiceImplTest {
    @Test
     void Test_addAlbumService(){
 
+        Role role = new Role(RoleName.ROLE_ADMIN);
+
+       List<Role> listaRoles = Arrays.asList(role);
+
+       User user = new User("Alfonso", "Gallardo", "Alfonsogr", "alfonsogr@gmail.com", "1234");
+       user.setId(userPrincipal.getId());
+       user.setRoles(listaRoles);
+
         album = new Album();
         album.setId(2L);
         album.setTitle("Nuevo Album");
@@ -172,6 +183,7 @@ public class PhotoServiceImplTest {
         albumResponse.setTitle("el album");
         album.setCreatedAt(Instant.now());
         album.setUpdatedAt(Instant.now());
+        album.setUser(user);
 
         PhotoRequest photoRequest = new PhotoRequest();
         photoRequest.setAlbumId(album.getId());
@@ -182,11 +194,47 @@ public class PhotoServiceImplTest {
         photo.setTitle("Foto");
         photo.setAlbum(album);
 
-        modelMapper.map(photoRequest, photo);
 
         when(albumRepository.findById(photoRequest.getAlbumId())).thenReturn(Optional.of(album));
-        //when(photoService.addPhoto(photoRequest,userPrincipal)).thenReturn(photo);
+        when(photoRepository.save(photo)).thenReturn(photo);
         assertEquals(photo, photoService.addPhoto(photoRequest,userPrincipal));
+
+    }
+
+    @Test
+    void test_updatePhoto(){
+
+        Role role = new Role(RoleName.ROLE_ADMIN);
+
+        List<Role> listaRoles = Arrays.asList(role);
+
+        User user = new User("Alfonso", "Gallardo", "Alfonsogr", "alfonsogr@gmail.com", "1234");
+        user.setId(userPrincipal.getId());
+        user.setRoles(listaRoles);
+
+        album = new Album();
+        album.setId(2L);
+        album.setTitle("Nuevo Album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        albumResponse = new AlbumResponse();
+        albumResponse.setTitle("el album");
+        album.setCreatedAt(Instant.now());
+        album.setUpdatedAt(Instant.now());
+        album.setUser(user);
+
+        PhotoRequest photoRequest = new PhotoRequest();
+        photoRequest.setAlbumId(album.getId());
+        photoRequest.setTitle("Foto de la playa");
+
+        Photo photo = new Photo();
+        photo.setId(1L);
+        photo.setTitle("Foto");
+        photo.setAlbum(album);
+
+        when(albumRepository.findById(photoRequest.getAlbumId())).thenReturn(Optional.of(album));
+        when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
+        assertEquals(photo, photoService.updatePhoto(1L,photoRequest,userPrincipal));
 
     }
 
