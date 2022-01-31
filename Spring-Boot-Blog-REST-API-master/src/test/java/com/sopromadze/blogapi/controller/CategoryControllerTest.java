@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,14 +33,13 @@ import java.util.stream.Collectors;
 import static org.hamcrest.Matchers.hasSize;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @Log
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {SpringSecurityTestWebConfig.class})
 @AutoConfigureMockMvc
 class CategoryControllerTest {
-
 
     @Autowired
     private MockMvc mockMvc;
@@ -69,7 +69,7 @@ class CategoryControllerTest {
         pagedResponseCategories = new PagedResponse(List.of(category), 1, 1, 1, 1, true);
 
 
-    when(categoryService.getAllCategories(1,1)).thenReturn(pagedResponseCategories);
+        when(categoryService.getAllCategories(1,1)).thenReturn(pagedResponseCategories);
         mockMvc.perform(get("/api/categories")
                         .param("page", "1")
                         .param("size", "1")
@@ -80,5 +80,102 @@ class CategoryControllerTest {
 
     }
 
+
+    @Test
+    @DisplayName("POST api/categories/")
+    @WithMockUser(authorities = {"ROLE_USER"})
+    void test_addCategories_Success() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(post("/api/categories")
+                .content(objectMapper.writeValueAsString(category))
+                .contentType("application/json"))
+         .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("POST api/categories/")
+    void test_addCategories_Fail() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(post("/api/categories")
+                        .content(objectMapper.writeValueAsString(category))
+                        .contentType("application/json"))
+                .andExpect(status().isForbidden()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("GET api/categories/{id}")
+    void test_get_Categories_ID_Success() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(get("/api/categories/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(category))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("PUT api/categories/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN"})
+    void test_put_Categories_Success() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(put("/api/categories/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(category))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("Delete api/categories/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
+    void test_Delete_Categories_Success() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(delete("/api/categories/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(category))
+                        .contentType("application/json"))
+                .andExpect(status().isNoContent()).andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Delete api/categories/{id}")
+    void test_Delete_Categories_fail() throws Exception {
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("MIMIR CALLATE YA");
+
+        mockMvc.perform(delete("/api/categories/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(category))
+                        .contentType("application/json"))
+                .andExpect(status().isNoContent()).andDo(print());
+
+    }
 
 }

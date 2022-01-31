@@ -41,21 +41,21 @@ public class CategoryController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category,
+	public Category addCategory(@Valid @RequestBody Category category,
 			@CurrentUser UserPrincipal currentUser) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(category, currentUser));
+		return categoryService.addCategory(category, currentUser);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Category> getCategory(@PathVariable(name = "id") Long id) {
-		return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategory(id));
+	public Category getCategory(@PathVariable(name = "id") Long id) {
+		return categoryService.getCategory(id);
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public ResponseEntity<Category> updateCategory(@PathVariable(name = "id") Long id,
+	public Category updateCategory(@PathVariable(name = "id") Long id,
 			@Valid @RequestBody Category category, @CurrentUser UserPrincipal currentUser) throws UnauthorizedException {
-		return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(id, category, currentUser));
+		return categoryService.updateCategory(id, category, currentUser);
 
 	}
 
