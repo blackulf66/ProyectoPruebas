@@ -3,6 +3,7 @@ package com.sopromadze.blogapi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sopromadze.blogapi.config.SpringSecurityTestWebConfig;
 import com.sopromadze.blogapi.model.Album;
+import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.model.Photo;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,7 +35,8 @@ import java.util.stream.Collectors;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.when;
@@ -58,11 +61,9 @@ public class AlbumControllerTest {
     Album album;
     AlbumRequest albumRequest;
     AlbumResponse albumResponse;
-    Page result1element,result1elementRequest;
     PagedResponse<AlbumResponse> pagedResponseAlbum;
     User user;
     List<Photo> listaFotos;
-    UserPrincipal userPrincipal;
 
     @BeforeEach
     void initTest(){
@@ -117,6 +118,58 @@ public class AlbumControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(content().json(objectMapper.writeValueAsString(pagedResponseAlbum)))
                 .andExpect(status().isOk()).andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("POST api/albums")
+    @WithMockUser(authorities = {"ROLE_USER"})
+    void test_addAlbumSuccess() throws Exception {
+
+        mockMvc.perform(post("/api/albums")
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("GET api/albums/{id}")
+    void test_getAlbumSuccess() throws Exception {
+
+
+        mockMvc.perform(get("/api/albums/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("PUT api/albums/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN"})
+    void test_updateAlbumSuccess() throws Exception {
+
+        mockMvc.perform(put("/api/albums/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("Delete api/albums/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
+    void test_deleteAlbumSuccess() throws Exception {
+
+        mockMvc.perform(delete("/api/albums/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isNoContent()).andDo(print());
 
     }
 
