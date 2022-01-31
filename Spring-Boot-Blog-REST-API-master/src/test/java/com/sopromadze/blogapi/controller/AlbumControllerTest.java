@@ -173,6 +173,28 @@ public class AlbumControllerTest {
 
     }
 
+    @Test
+    @DisplayName("POST api/albums")
+    void test_addAlbumFail() throws Exception {
+
+        mockMvc.perform(post("/api/albums")
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("Delete api/albums/{id}")
+    void test_deleteAlbumFail() throws Exception {
+
+        mockMvc.perform(delete("/api/albums/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(album))
+                        .contentType("application/json"))
+                .andExpect(status().isNoContent()).andDo(print());
+
+    }
 
 
 }
