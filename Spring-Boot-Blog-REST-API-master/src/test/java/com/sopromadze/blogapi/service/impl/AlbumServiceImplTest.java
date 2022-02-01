@@ -1,6 +1,8 @@
 package com.sopromadze.blogapi.service.impl;
 
+import com.sopromadze.blogapi.exception.BlogapiException;
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.model.Tag;
@@ -173,29 +175,96 @@ class AlbumServiceImplTest {
     }
 
     @Test
+    void test_deletedAlbumResourceNotFoundExeption_Success(){
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        albumRepository.save(album);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deleteAlbum(1L,user_prueba);
+
+        assertThrows(ResourceNotFoundException.class,()->albumService.deleteAlbum(2L ,user_prueba));
+
+    }
+
+    @Test
+    void test_deletedAlbumExeption_Success(){
+
+        Role rol = new Role();
+        rol.setName(RoleName.ROLE_USER);
+
+        List<Role> roles = Arrays.asList(rol);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setRoles(roles);
+
+        UserPrincipal user_prueba = new UserPrincipal(1L,"name","lastName","username","user_prueba@gmail.com","123456789",
+                user1.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList()));
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        albumRepository.save(album);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deleteAlbum(1L,user_prueba);
+
+        assertThrows(ResourceNotFoundException.class,()->albumService.deleteAlbum(1323L ,user_prueba));
+
+    }
+
+    @Test
+    void test_deletedAlbumExeption2_Success(){
+
+        Role rol = new Role();
+        rol.setName(RoleName.ROLE_USER);
+
+        List<Role> roles = Arrays.asList(rol);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setRoles(roles);
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setRoles(roles);
+
+        UserPrincipal user_prueba = UserPrincipal.create(user1);
+
+        UserPrincipal user_prueba2 = UserPrincipal.create(user2);
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        album.setUser(user1);
+        albumRepository.save(album);
+
+        when(albumRepository.findById(1L)).thenReturn(Optional.of(album));
+        when(userRepository.getUser(any())).thenReturn(user1);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+
+        assertThrows(BlogapiException.class,()->albumService.deleteAlbum(1L ,user_prueba2));
+
+    }
+
+    @Test
     void test_getalbumThrowResourceNotFoundException(){
         when(albumRepository.findById(any(Long.class))).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class,()->albumService.getAlbum(any(Long.class)));
     }
 
-    /* @Override
-	public AlbumResponse updateAlbum(Long id, AlbumRequest newAlbum, UserPrincipal currentUser) {
-		Album album = albumRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ALBUM_STR, ID, id));
-		User user = userRepository.getUser(currentUser);
-		if (album.getUser().getId().equals(user.getId()) || currentUser.getAuthorities()
-				.contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString()))) {
-			album.setTitle(newAlbum.getTitle());
-			Album updatedAlbum = albumRepository.save(album);
-
-			AlbumResponse albumResponse = new AlbumResponse();
-
-			modelMapper.map(updatedAlbum, albumResponse);
-
-			return albumResponse;
-		}
-
-		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);
-	}*/
     @Test
     void test_updateAlbumSuccess() {
 
