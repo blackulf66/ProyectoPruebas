@@ -2,9 +2,13 @@ package com.sopromadze.blogapi.service.impl;
 
 
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Tag;
-import com.sopromadze.blogapi.payload.AlbumResponse;
+import com.sopromadze.blogapi.model.role.Role;
+import com.sopromadze.blogapi.model.role.RoleName;
+import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.payload.ApiResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.repository.TagRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
@@ -12,24 +16,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -52,6 +58,9 @@ public class TagServiceTest {
     PagedResponse<Tag> result;
     Page<Tag> pageResult;
 
+    UserPrincipal user_prueba;
+    User user1;
+
     @BeforeEach
     void InitData(){
         tag = new Tag();
@@ -69,6 +78,19 @@ public class TagServiceTest {
         result.setContent(List.of(tag));
 
         List<Album> albums = new ArrayList<>();
+
+        Role rol = new Role();
+        rol.setName(RoleName.ROLE_ADMIN);
+
+        List<Role> roles = Arrays.asList(rol);
+
+        user1 = new User();
+        user1.setId(1L);
+        user1.setRoles(roles);
+
+        user_prueba = new UserPrincipal(user1.getId(),"name","lastName","username","user_prueba@gmail.com","123456789",
+                user1.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList()));
     }
 
     @Test
@@ -96,15 +118,75 @@ public class TagServiceTest {
 
     @Test
     void test_addTagSuccess(){
-        UserPrincipal usuario_prueba = Mockito.mock(UserPrincipal.class);
-        when(tagService.addTag(tag,usuario_prueba)).thenReturn(tag);
-        assertEquals(tag,tagService.addTag(tag,usuario_prueba));
+        when(tagService.addTag(tag,user_prueba)).thenReturn(tag);
+        assertEquals(tag,tagService.addTag(tag,user_prueba));
     }
 
 
     @Test
-    void updateTag(){
+    void test_updateTagSuccess(){
 
+
+        Tag tag1 = new Tag("tag de prueba");
+        tag1.setId(1L);
+        tag1.setCreatedBy(1L);
+        when(tagRepository.save(tag1)).thenReturn(tag1);
+
+        Tag tag2 = new Tag("tag de prueba editado");
+
+        when(tagRepository.findById(1L)).thenReturn(Optional.of(tag1));
+
+        assertEquals(tag1,tagService.updateTag(1L,tag2,user_prueba));
+
+    }
+
+    @Test
+    void test_updateTagThrowResourceNotFoundException(){
+
+        Tag tag1 = new Tag("tag de prueba");
+        tag1.setId(1L);
+        tag1.setCreatedBy(1L);
+        when(tagRepository.save(tag1)).thenReturn(tag1);
+
+        Tag tag2 = new Tag("tag de prueba editado");
+
+        when(tagRepository.findById(1L)).thenReturn(Optional.of(tag1));
+
+        assertThrows(ResourceNotFoundException.class,()->tagService.updateTag(2L,tag2,user_prueba));
+
+    }
+
+    @Test
+    void test_updateTagThrowUnauthorizedException(){
+
+        UserPrincipal user_prueba2 = new UserPrincipal(2L,"name","lastName","username","user_prueba@gmail.com","123456789",
+                user1.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_USER")).collect(Collectors.toList()));
+
+        Tag tag1 = new Tag("tag de prueba");
+        tag1.setId(1L);
+        tag1.setCreatedBy(1L);
+        when(tagRepository.save(tag1)).thenReturn(tag1);
+
+        Tag tag2 = new Tag("tag de prueba editado");
+
+        when(tagRepository.findById(1L)).thenReturn(Optional.of(tag1));
+
+        assertThrows(UnauthorizedException.class,()->tagService.updateTag(1L,tag2,user_prueba2));
+
+    }
+
+    @Test
+    void test_deleteTagSuccess(){
+
+        Tag tag1 = new Tag("tag de prueba");
+        tag1.setId(1L);
+        tag1.setCreatedBy(1L);
+        when(tagRepository.save(tag1)).thenReturn(tag1);
+        when(tagRepository.findById(1L)).thenReturn(Optional.of(tag1));
+        ApiResponse apiResponse = new ApiResponse(Boolean.TRUE, "You successfully deleted tag");
+
+        assertEquals(apiResponse,tagService.deleteTag(1L,user_prueba));
 
     }
 
