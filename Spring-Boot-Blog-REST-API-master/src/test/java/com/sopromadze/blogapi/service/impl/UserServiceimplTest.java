@@ -17,6 +17,7 @@ import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -272,6 +273,7 @@ public class UserServiceimplTest {
     @Test
     void shouldDeleteUser(){
 
+<<<<<<< HEAD
         UserServiceImpl service = mock(UserServiceImpl.class);
         UserPrincipal user_prueba = mock(UserPrincipal.class);
 
@@ -286,6 +288,21 @@ public class UserServiceimplTest {
 
         when(userService.deleteUser("manuelito", userPrincipal)).thenThrow(new ResourceNotFoundException("User", "id", "manuelito"));
         assertThrows()
+=======
+
+        when(this.userRepository.findByUsername("albertito")).thenReturn(Optional.of(user));
+
+        userRepository.save(user);
+
+        assertTrue(this.userRepository.existsByUsername("albertito"));
+
+        when(this.userRepository.findByEmail("albertito@hotmail.com")).thenReturn(Optional.of(user));
+
+        userRepository.save(user);
+
+        assertTrue(this.userRepository.existsByUsername("albertito@hotmail.com"));
+
+>>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
 
 
     }
@@ -344,6 +361,11 @@ public class UserServiceimplTest {
 
 
 
+<<<<<<< HEAD
+=======
+//        assertTrue();
+//        lenient().when(usuario.getRoles()).thenReturn();
+>>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
 
 
 
