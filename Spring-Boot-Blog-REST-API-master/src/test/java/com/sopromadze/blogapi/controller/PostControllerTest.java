@@ -13,7 +13,6 @@ import com.sopromadze.blogapi.payload.PostRequest;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,17 +21,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.persistence.Lob;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -97,13 +91,7 @@ class PostControllerTest {
         return new ResponseBodyMatchers();
     }
 
-    @Test
-    @WithMockUser(authorities = {"ROLE_USER"})
-    void test_addPost_return400() throws Exception {
-        mockMvc.perform(post("/api/posts")
-                        .contentType("application/json"))
-                    .andExpect(status().isBadRequest());
-    }
+
 
     @Test
     @WithMockUser(authorities = {"ROLE_USER"})
@@ -114,50 +102,55 @@ class PostControllerTest {
                 .andExpect(status().isCreated());
         }
 
-        @Test
-        @WithMockUser(authorities = {"ROLE_ADMIN"})
+    @Test
+    @WithMockUser(authorities = {"ROLE_USER"})
+    void test_addPost_return400() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .contentType("application/json"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"ROLE_ADMIN"})
     void test_addPost_return403() throws Exception {
-
-            mockMvc.perform(post("/api/posts")
-                            .contentType("application/json")
-                            .content(objectMapper.writeValueAsString(postRequest)))
+        mockMvc.perform(post("/api/posts")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(postRequest)))
                     .andExpect(status().isForbidden());
-        }
+    }
 
-        @Test
-        @WithMockUser(authorities = {"ROLE_USER"})
-        void test_getAllPost () throws Exception {
-
-            when(postService.getAllPosts(1,1)).thenReturn(pagedResponsePost);
-            mockMvc.perform(get("/api/posts")
+    @Test
+    @WithMockUser(authorities = {"ROLE_USER"})
+    void test_getAllPost () throws Exception {
+        when(postService.getAllPosts(1,1)).thenReturn(pagedResponsePost);
+        mockMvc.perform(get("/api/posts")
                     .param("page", "1")
                     .param("size", "1")
                     .contentType("application/json"))
-                    .andExpect(jsonPath("$.content", hasSize(1)))
-                    .andExpect(content().json(objectMapper.writeValueAsString(pagedResponsePost)))
-                    .andExpect(status().isOk()).andDo(print());
-        }
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(content().json(objectMapper.writeValueAsString(pagedResponsePost)))
+                .andExpect(status().isOk()).andDo(print());
+    }
 
 
 
-        @Test
-        @WithMockUser(authorities = {"ROLE_ADMIN"})
-        void test_getPost () throws Exception {
-
-            mockMvc.perform(get("/api/posts/{id}", 1L)
+    @Test
+    @WithMockUser(authorities = {"ROLE_ADMIN"})
+    void test_getPost () throws Exception {
+        mockMvc.perform(get("/api/posts/{id}", 1L)
                     .content(objectMapper.writeValueAsString(post))
                     .contentType("application/json"))
-                    .andExpect(status().isOk()).andDo(print());
-        }
+                .andExpect(status().isOk()).andDo(print());
+    }
 
-        @Test
-        @WithMockUser(authorities = {"ROLE_ADMIN", "ROLE_USER"})
-        void test_updatePost () throws Exception {
-            mockMvc.perform(put("/api/posts/{id}", 1L)
+    @Test
+    @WithMockUser(authorities = {"ROLE_ADMIN", "ROLE_USER"})
+    void test_updatePost () throws Exception {
+        mockMvc.perform(put("/api/posts/{id}", 1L)
                     .content(objectMapper.writeValueAsString(postRequest))
                     .contentType("application/json"))
-                    .andExpect(status().isOk()).andDo(print());
-        }
+                .andExpect(status().isOk()).andDo(print());
+    }
 
     @Test
     @WithMockUser(authorities = {"ROLE_OTRO"})
@@ -176,12 +169,12 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-        @Test
-        @WithMockUser(authorities = {"ROLE_ADMIN", "ROLE_USER"})
-        void test_deletePost () throws Exception {
+    @Test
+    @WithMockUser(authorities = {"ROLE_ADMIN", "ROLE_USER"})
+    void test_deletePost () throws Exception {
         mockMvc.perform(delete("/api/posts/{id}", 1L)
-                .content(objectMapper.writeValueAsString(post))
-                .contentType("application/json"))
+                    .content(objectMapper.writeValueAsString(post))
+                    .contentType("application/json"))
                 .andExpect(status().isOk()).andDo(print());
         }
 
@@ -203,7 +196,6 @@ class PostControllerTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"ROLE_USER"})
     void test_getPostByTag () throws Exception {
         when(postService.getAllPosts(1,1)).thenReturn(pagedResponsePost);
         mockMvc.perform(get("/api/posts/tag/{id}", 1L)
@@ -213,5 +205,12 @@ class PostControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    @Test
+    void test_getPostByCategory () throws Exception {
+        mockMvc.perform(get("/api/posts/category/{id}", 1L)
+                .content(objectMapper.writeValueAsString(post))
+                .contentType("applicatio/json"))
+                .andExpect(status().isOk()).andDo(print());
+    }
 
 }
