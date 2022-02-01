@@ -188,7 +188,6 @@ public class CategoryServiceImplTest {
         when(categoryRepository.save(cat1)).thenReturn(cat1);
 
         Category cat2 = new Category("dummy_category changed");
-        cat1.setCreatedBy(1L);
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
 
@@ -212,5 +211,5 @@ public class CategoryServiceImplTest {
         verify(catService, times(1)).deleteCategory(1L, user_prueba);
 
     }
-    
+
 }
