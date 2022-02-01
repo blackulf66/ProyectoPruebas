@@ -30,10 +30,12 @@ class TodoRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    @BeforeEach
+    User user;
+    Todo todo;
 
+    @BeforeEach
     void init() {
-        User user = new User();
+        user = new User();
         user.setEmail("user@email.com");
         user.setFirstName("FirstName");
         user.setUsername("UserName");
@@ -44,7 +46,7 @@ class TodoRepositoryTest {
 
         testEntityManager.persist(user);
 
-        Todo todo= new Todo();
+        todo= new Todo();
         todo.setTitle("Todo");
         todo.setCreatedAt(Instant.now());
         todo.setUpdatedAt(Instant.now());
