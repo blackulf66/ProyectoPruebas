@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
@@ -34,8 +36,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
+@DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CategoryServiceImplTest {
 
     @Mock
@@ -51,7 +54,6 @@ public class CategoryServiceImplTest {
     @InjectMocks
     private CategoryServiceImpl categoryService;
 
-    //TODO: Daniel de Luna Rodríguez
     @Test
     void test_getAllCategories() {
 
@@ -94,8 +96,8 @@ public class CategoryServiceImplTest {
         assertThrows(ResourceNotFoundException.class,()->categoryService.getCategory(any(Long.class)));
     }
 
-   /* @Test
-    void test_updateCategoryThrowUnauthorizedException(){
+    @Test
+    void test_updateCategoryThrowResourceNotFoundException(){
 
         Role rol = new Role();
         rol.setName(RoleName.ROLE_ADMIN);
@@ -112,25 +114,48 @@ public class CategoryServiceImplTest {
 
         Category cat1 = new Category("dummy_category");
         cat1.setId(1L);
-        cat1.setCreatedBy(2L);
+        cat1.setCreatedBy(1L);
         when(categoryRepository.save(cat1)).thenReturn(cat1);
 
         Category cat2 = new Category("dummy_category changed");
         cat1.setCreatedBy(1L);
 
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
 
-        when(categoryRepository.save(cat2)).thenReturn(cat2);
+        assertThrows(ResourceNotFoundException.class,()->categoryService.updateCategory(2L,cat2,user_prueba));
+
+
+    }
+
+    @Test
+    void test_updateCategoryThrowUnauthorizedException(){
+
+        Role rol = new Role();
+        rol.setName(RoleName.ROLE_USER);
+
+        List<Role> roles = Arrays.asList(rol);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setRoles(roles);
+
+        UserPrincipal user_prueba = new UserPrincipal(2L,"name","lastName","username","user_prueba@gmail.com","123456789",
+                user1.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList()));
+
+        Category cat1 = new Category("dummy_category");
+        cat1.setId(1L);
+        cat1.setCreatedBy(1L);
+        when(categoryRepository.save(cat1)).thenReturn(cat1);
+
+        Category cat2 = new Category("dummy_category changed");
+        cat2.setCreatedBy(1L);
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
-        cat1.setName(cat2.getName());
-
-        when(categoryRepository.save(cat1)).thenReturn(cat1);
-        when(categoryRepository.findById(2L)).thenReturn(Optional.empty());
 
         assertThrows(UnauthorizedException.class,()->categoryService.updateCategory(1L,cat2,user_prueba));
 
-
-    }*/
+    }
 
     @Test
     void test_addCategorySuccess(){
@@ -141,8 +166,6 @@ public class CategoryServiceImplTest {
         assertEquals(categoryService.addCategory(cat1,user_prueba),cat1);
     }
 
-
-    //ToDo:Update No funciona
     @Test
     void test_updateCategorySuccess() {
 
@@ -167,20 +190,14 @@ public class CategoryServiceImplTest {
         Category cat2 = new Category("dummy_category changed");
         cat1.setCreatedBy(1L);
 
-
-        when(categoryRepository.save(cat2)).thenReturn(cat2);
-
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat1));
-        cat1.setName(cat2.getName());
-
-        when(categoryRepository.save(cat1)).thenReturn(cat1);
 
         assertEquals(cat1,categoryService.updateCategory(1L,cat2,user_prueba));
     }
 
 
     @Test
-    void test_deletedCategorySuccess(){
+    void test_deleteCategorySuccess(){
 
         CategoryServiceImpl catService = mock(CategoryServiceImpl.class);
         UserPrincipal user_prueba = mock(UserPrincipal.class);
@@ -195,4 +212,5 @@ public class CategoryServiceImplTest {
         verify(catService, times(1)).deleteCategory(1L, user_prueba);
 
     }
+    
 }
