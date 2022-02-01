@@ -1,5 +1,6 @@
 package com.sopromadze.blogapi.service.impl;
 
+import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.model.user.User;
@@ -172,6 +173,26 @@ class AlbumServiceImplTest {
         verify(albumService1, times(1)).deleteAlbum(1L, user_prueba);
 
     }
+
+    @Test
+    void test_deletedAlbum_exception(){
+
+        AlbumServiceImpl albumService1 = mock(AlbumServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        Album album = new Album();
+        album.setTitle("album");
+        album.setId(1L);
+        albumRepository.save(album);
+
+        doNothing().when(albumService1).deleteAlbum(isA(Long.class),isA(UserPrincipal.class));
+        albumService1.deleteAlbum(1L,user_prueba);
+
+        verify(albumService1, times(1)).deleteAlbum(1L, user_prueba);
+        assertThrows(ResourceNotFoundException.class,()->albumService1.getAlbum(any(Long.class)));
+
+    }
+
 
     @Test
     void test_deletedAlbum_fail(){

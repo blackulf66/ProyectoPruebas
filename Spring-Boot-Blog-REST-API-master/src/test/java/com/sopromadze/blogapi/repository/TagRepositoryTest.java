@@ -1,9 +1,20 @@
 package com.sopromadze.blogapi.repository;
 
+import com.sopromadze.blogapi.model.Album;
+import com.sopromadze.blogapi.model.Photo;
+import com.sopromadze.blogapi.model.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.Instant;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
@@ -14,9 +25,33 @@ class TagRepositoryTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private TestEntityManager testEntityManager;
+
+    @Test
+    void test_NotNull(){ assertNotNull(tagRepository);}
+
     /*@Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-	Tag findByName(String name);
-}*/
+    public interface TagRepository extends JpaRepository<Tag, Long> {
+        Tag findByName(String name);
+    }*/
+    @Test
+    void test_commentRepository_success() {
+
+        Tag tag = new Tag();
+        tag.setName("nombre");
+        tag.setCreatedBy(1L);
+        tag.setUpdatedAt(Instant.now());
+        tag.setCreatedAt(Instant.now());
+
+        testEntityManager.persist(tag);
+
+        assertEquals(1, tagRepository.findByName(tag.getName()).getId());
+
+
+    }
+
+
+
 
 }
