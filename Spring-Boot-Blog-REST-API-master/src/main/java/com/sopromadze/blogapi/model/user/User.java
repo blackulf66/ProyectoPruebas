@@ -8,6 +8,7 @@ import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Post;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.Todo;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -117,6 +118,8 @@ public class User extends DateAudit {
 		this.email = email;
 		this.password = password;
 	}
+
+
 
 
 

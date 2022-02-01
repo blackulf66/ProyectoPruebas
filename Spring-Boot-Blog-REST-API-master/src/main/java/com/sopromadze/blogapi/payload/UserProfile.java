@@ -23,4 +23,6 @@ public class UserProfile {
 	private String website;
 	private Company company;
 	private Long postCount;
+
+
 }

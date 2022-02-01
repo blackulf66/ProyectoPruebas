@@ -21,6 +21,7 @@ import com.sopromadze.blogapi.repository.RoleRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+
 	private final UserRepository userRepository;
 
 	private final PostRepository postRepository;
@@ -42,6 +44,9 @@ public class UserServiceImpl implements UserService {
 	private final RoleRepository roleRepository;
 
 	private final PasswordEncoder passwordEncoder;
+
+
+
 
 	@Override
 	public UserSummary getCurrentUser(UserPrincipal currentUser) {
