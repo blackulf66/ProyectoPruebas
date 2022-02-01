@@ -74,6 +74,7 @@ public class PhotoServiceImpl implements PhotoService {
 				photo.getThumbnailUrl(), photo.getAlbum().getId());
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PhotoResponse updatePhoto(Long id, PhotoRequest photoRequest, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(photoRequest.getAlbumId())

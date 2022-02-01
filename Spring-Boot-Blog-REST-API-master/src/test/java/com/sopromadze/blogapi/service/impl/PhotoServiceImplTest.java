@@ -1,5 +1,7 @@
 package com.sopromadze.blogapi.service.impl;
 
+import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Photo;
 import com.sopromadze.blogapi.model.role.Role;
@@ -195,9 +197,12 @@ public class PhotoServiceImplTest {
         photo.setAlbum(album);
 
 
-        when(albumRepository.findById(photoRequest.getAlbumId())).thenReturn(Optional.of(album));
-        when(photoRepository.save(photo)).thenReturn(photo);
-        assertEquals(photo, photoService.addPhoto(photoRequest,userPrincipal));
+       PhotoResponse photoResponse = new PhotoResponse(1L, "Foto de la playa", null, null, album.getId());
+
+       when(albumRepository.findById(any(Long.class))).thenReturn(Optional.of(album));
+       when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
+       when(photoRepository.save(photo)).thenReturn(photo);
+       assertEquals(photoResponse, photoService.addPhoto(photoRequest,userPrincipal));
 
     }
 
@@ -232,9 +237,12 @@ public class PhotoServiceImplTest {
         photo.setTitle("Foto");
         photo.setAlbum(album);
 
-        when(albumRepository.findById(photoRequest.getAlbumId())).thenReturn(Optional.of(album));
+        PhotoResponse photoResponse = new PhotoResponse(1L, "Foto de la playa", null, null, album.getId());
+
+        when(albumRepository.findById(any(Long.class))).thenReturn(Optional.of(album));
         when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
-        assertEquals(photo, photoService.updatePhoto(1L,photoRequest,userPrincipal));
+        when(photoRepository.save(photo)).thenReturn(photo);
+        assertEquals(photoResponse, photoService.updatePhoto(1L,photoRequest,userPrincipal));
 
     }
 
