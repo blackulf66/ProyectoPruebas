@@ -7,10 +7,7 @@ import com.sopromadze.blogapi.model.Post;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.User;
-import com.sopromadze.blogapi.payload.PagedResponse;
-import com.sopromadze.blogapi.payload.UserIdentityAvailability;
-import com.sopromadze.blogapi.payload.UserProfile;
-import com.sopromadze.blogapi.payload.UserSummary;
+import com.sopromadze.blogapi.payload.*;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.AlbumService;
 import com.sopromadze.blogapi.service.CommentService;
@@ -21,6 +18,7 @@ import lombok.extern.java.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -36,9 +35,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.modelmapper.internal.bytebuddy.matcher.ElementMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -186,5 +186,70 @@ public class UserControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(albums)))
                 .andExpect(status().isOk()).andDo(print());
     }
+
+    @Test
+    @DisplayName("POST /api/users")
+    @WithMockUser(authorities = {"ROLE_ADMIN","ROLE_USER"})
+    void test_addUserSuccess() throws Exception {
+
+        when(userService.addUser(Mockito.any())).thenReturn(usuario_test);
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(usuario_test)))
+                .andExpect(status().isCreated()).andReturn();
+
+
+        User usuarioActual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),User.class);
+
+        assertEquals(usuarioActual.getUsername(),usuario_test.getUsername());
+
+    }
+
+    @Test
+    @DisplayName("PUT /api/users/{username}")
+    @WithMockUser(authorities = {"ROLE_ADMIN","ROLE_USER"})
+    void test_updateUserSuccess() throws Exception{
+
+        User usuario_test_new = new User("usuario","de prueba22","username2","test2email@gmail.com","qwertyasdf");
+        usuario_test_new.setRoles(List.of(new Role(RoleName.ROLE_ADMIN)));
+
+        UserPrincipal usuarioActual = UserPrincipal.create(usuario_test);
+
+        when(userService.updateUser(usuario_test_new,usuario_test.getUsername(),usuarioActual)).thenReturn(usuario_test_new);
+        mockMvc.perform(put("/api/users/{username}", usuario_test.getUsername())
+                        .content(objectMapper.writeValueAsString(usuario_test_new))
+                        .contentType("application/json"))
+                .andExpect(status().isCreated()).andDo(print());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/users/{username}")
+    @WithMockUser(authorities = {"ROLE_ADMIN","ROLE_USER"})
+    void test_deleteUserSuccess() throws Exception{
+        mockMvc.perform(delete("/api/users/{username}", usuario_test.getUsername())
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("PUT /{username}/giveAdmin")
+    @WithMockUser(authorities = {"ROLE_ADMIN","ROLE_USER"})
+    void test_giveAdminSuccess() throws Exception{
+
+        User usuario_test_userRole = new User("usuario","de prueba","username","testemail@gmail.com","qwerty");
+        usuario_test_userRole.setId(1L);
+        usuario_test_userRole.setRoles(List.of(new Role(RoleName.ROLE_USER)));
+
+        mockMvc.perform(put("/api/users/{username}/giveAdmin", usuario_test_userRole.getUsername())
+                        .contentType("application/json"))
+                .andExpect(status().isOk()).andDo(print());
+
+    }
+
+    
+
 
 }
