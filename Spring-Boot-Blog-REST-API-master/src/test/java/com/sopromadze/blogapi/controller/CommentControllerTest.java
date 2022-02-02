@@ -126,12 +126,10 @@ public class CommentControllerTest {
     @WithMockUser(authorities = {"ROLE_ADMIN"})
     void test_putCommentSuccess() throws Exception {
 
-
         mockMvc.perform(put("/api/posts/{id}/comments/{id}", 1L,1L)
                         .content(objectMapper.writeValueAsString(comment))
                         .contentType("application/json"))
                 .andExpect(status().isOk()).andDo(print());
-
 
     }
 
@@ -151,6 +149,7 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("POST /api/posts/{id}/comments")
+    @WithMockUser(authorities = {"ROLE_OTHER"})
     void test_addCommentFail() throws Exception {
 
         mockMvc.perform(post("/api/posts/{id}/comments",1L)
@@ -163,14 +162,13 @@ public class CommentControllerTest {
 
     @Test
     @DisplayName("Delete /api/posts/{id}/comments/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
     void test_deleteCommentFail() throws Exception {
-
 
         mockMvc.perform(delete("/api/posts/{id}/comments/{id}", 1L,1L)
                         .content(objectMapper.writeValueAsString(comment))
                         .contentType("application/json"))
                 .andExpect(status().isNoContent()).andDo(print());
-
     }
 
 

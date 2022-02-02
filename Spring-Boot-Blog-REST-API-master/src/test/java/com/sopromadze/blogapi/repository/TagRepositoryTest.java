@@ -31,15 +31,14 @@ class TagRepositoryTest {
     @Test
     void test_NotNull(){ assertNotNull(tagRepository);}
 
-    /*@Repository
-    public interface TagRepository extends JpaRepository<Tag, Long> {
-        Tag findByName(String name);
-    }*/
     @Test
+        //TEST: test para comprobar que hay objetos en el repositorio
+        //ENTRADA:
+        //RESULTADO ESPERADO: devolver los elementos totales del repositorio
     void test_commentRepository_success() {
 
         Tag tag = new Tag();
-        tag.setName("nombre");
+        tag.setName("Selina Kyle");
         tag.setCreatedBy(1L);
         tag.setUpdatedAt(Instant.now());
         tag.setCreatedAt(Instant.now());
@@ -55,3 +54,4 @@ class TagRepositoryTest {
 
 
 }
+
