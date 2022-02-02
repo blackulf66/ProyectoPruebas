@@ -305,7 +305,6 @@ class AlbumServiceImplTest {
 
         when(albumRepository.save(album)).thenReturn(album);
 
-
         when(modelMapper.map(any(),any())).thenReturn(albumResponse);
 
         assertEquals(albumResponse,albumService.updateAlbum(1L,album2,user_prueba));

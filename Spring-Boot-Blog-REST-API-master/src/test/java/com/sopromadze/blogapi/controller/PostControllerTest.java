@@ -61,6 +61,9 @@ class PostControllerTest {
     @Test
     @WithUserDetails("admin")
     @DisplayName("GET api/posts/")
+        //TEST: obtener todas las categorias
+        //ENTRADA: get /api/posts
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_getAll_Categories_Success() throws Exception {
 
         post = new Post();
@@ -79,20 +82,11 @@ class PostControllerTest {
 
     }
 
-    /*@GetMapping("/category/{id}")
-	public PagedResponse<Post> getPostsByCategory(
-			@RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-			@RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
-			@PathVariable(name = "id") Long id) {
-		PagedResponse<Post> response = postService.getPostsByCategory(id, page, size);
-
-		return response;
-	}*/
-
-
-
     @Test
     @DisplayName("GET api/posts/")
+        //TEST: obtener las categorias de un post por id
+        //ENTRADA: get /api/posts/category/{id}
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_get_CategoriesID_Success() throws Exception {
 
         post = new Post();
@@ -112,16 +106,12 @@ class PostControllerTest {
                 .andExpect(status().isOk()).andDo(print());
 
     }
-    /*
-    * @GetMapping("/{id}")
-	public Post getPost(@PathVariable(name = "id") Long id) {
-		Post post = postService.getPost(id);
-
-		return post;
-	}*/
 
     @Test
     @DisplayName("GET api/posts/{id}")
+        //TEST: obtener las categorias  por id
+        //ENTRADA: get /api/categories/{id}
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_get_Categories_ID_Success() throws Exception {
 
         post = new Post();
@@ -137,6 +127,9 @@ class PostControllerTest {
     }
     @Test
     @DisplayName("GET api/posts/")
+        //TEST: obtener los tags de un post por id
+        //ENTRADA: get /api/posts/tag/{id}
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_get_Tag_Id_Success() throws Exception {
 
         post = new Post();
@@ -160,6 +153,9 @@ class PostControllerTest {
     @Test
     @WithMockUser(authorities = {"ROLE_USER"})
     @DisplayName("POST api/posts/")
+        //TEST: agregar un post
+        //ENTRADA: post /api/posts
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_addCategories_success() throws Exception {
         Category category = new Category();
         category.setName("casads");
@@ -182,6 +178,9 @@ class PostControllerTest {
     @Test
     @DisplayName("PUT api/posts/{id}")
     @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
+        //TEST: actualizar un post ya agregado
+        //ENTRADA: put /api/posts/{id}
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_put_Categories_Success() throws Exception {
 
         category = new Category();
@@ -200,16 +199,12 @@ class PostControllerTest {
 
     }
 
-    /*@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public ApiResponse deletePost(@PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
-		ApiResponse apiResponse = postService.deletePost(id, currentUser);
-
-		return apiResponse;
-	}*/
     @Test
     @DisplayName("Delete api/posts/{id}")
     @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
+        //TEST: eliminar un post ya agregado
+        //ENTRADA: update /api/posts/{id}
+        //RESULTADO ESPERADO: que devuelva un 200
     void test_Delete_Categories_fail() throws Exception {
         Category category = new Category();
         category.setId(1L);
