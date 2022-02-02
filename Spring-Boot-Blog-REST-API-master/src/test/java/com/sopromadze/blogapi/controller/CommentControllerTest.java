@@ -59,7 +59,6 @@ public class CommentControllerTest {
         post = new Post();
         post.setId(1L);
 
-
         comment = new Comment();
         comment.setId(1L);
         comment.setName("comment");
