@@ -15,6 +15,7 @@ import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.PhotoService;
 import com.sopromadze.blogapi.utils.AppConstants;
 import com.sopromadze.blogapi.utils.AppUtils;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 	private final AlbumRepository albumRepository;
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PagedResponse<PhotoResponse> getAllPhotos(int page, int size) {
 		AppUtils.validatePageNumberAndSize(page, size);
@@ -63,6 +65,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PhotoResponse getPhoto(Long id) {
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
@@ -71,6 +74,7 @@ public class PhotoServiceImpl implements PhotoService {
 				photo.getThumbnailUrl(), photo.getAlbum().getId());
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PhotoResponse updatePhoto(Long id, PhotoRequest photoRequest, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(photoRequest.getAlbumId())
@@ -91,6 +95,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
+	//TODO Haciendose por Alfonso
 	@Override
 	public PhotoResponse addPhoto(PhotoRequest photoRequest, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(photoRequest.getAlbumId())
@@ -108,6 +113,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public ApiResponse deletePhoto(Long id, UserPrincipal currentUser) {
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
@@ -122,6 +128,7 @@ public class PhotoServiceImpl implements PhotoService {
 		throw new UnauthorizedException(apiResponse);
 	}
 
+	//TODO Hecho por Alfonso
 	@Override
 	public PagedResponse<PhotoResponse> getAllPhotosByAlbum(Long albumId, int page, int size) {
 		AppUtils.validatePageNumberAndSize(page, size);

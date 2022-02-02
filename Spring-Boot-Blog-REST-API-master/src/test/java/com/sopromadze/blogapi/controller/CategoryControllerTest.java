@@ -2,15 +2,8 @@ package com.sopromadze.blogapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sopromadze.blogapi.config.SpringSecurityTestWebConfig;
-import com.sopromadze.blogapi.model.Album;
 import com.sopromadze.blogapi.model.Category;
-import com.sopromadze.blogapi.model.role.Role;
-import com.sopromadze.blogapi.model.role.RoleName;
-import com.sopromadze.blogapi.model.user.User;
-import com.sopromadze.blogapi.payload.AlbumResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
-import com.sopromadze.blogapi.payload.request.AlbumRequest;
-import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.CategoryService;
 import com.sopromadze.blogapi.utils.AppUtils;
 import lombok.extern.java.Log;
@@ -20,15 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import static org.hamcrest.Matchers.hasSize;
 
@@ -144,9 +135,7 @@ class CategoryControllerTest {
                         .contentType("application/json"))
                 .andExpect(status().isOk()).andDo(print());
 
-
     }
-
     @Test
     @DisplayName("Delete api/categories/{id}")
     @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})

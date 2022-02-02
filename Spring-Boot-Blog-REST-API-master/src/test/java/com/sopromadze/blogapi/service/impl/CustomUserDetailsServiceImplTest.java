@@ -1,5 +1,12 @@
 package com.sopromadze.blogapi.service.impl;
 
+import com.sopromadze.blogapi.model.role.Role;
+import com.sopromadze.blogapi.model.role.RoleName;
+import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.repository.AlbumRepository;
+import com.sopromadze.blogapi.repository.UserRepository;
+import com.sopromadze.blogapi.security.UserPrincipal;
+import com.sopromadze.blogapi.service.UserService;
 
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
@@ -14,50 +21,137 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.modelmapper.ModelMapper;
-import static org.junit.jupiter.api.Assertions.*;
-import java.time.Instant;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class CustomUserDetailsServiceImplTest {
+class CustomUserDetailsServiceImplTest {
+
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
-    CustomUserDetailsServiceImpl customUserDetailsService;
+    private CustomUserDetailsServiceImpl customUserDetailsService;
 
-    @Mock
-    private final ModelMapper modelMapper;
-    CustomUserDetailsServiceImplTest() {
-        modelMapper = null;
-    }
 
-    @Mock
-    UserRepository userRepository;
+    /*
+    * @Override
+	@Transactional
+	public UserDetails loadUserByUsername(String usernameOrEmail) {
+		User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+				.orElseThrow(() -> new UsernameNotFoundException(String.format("User not found with this username or email: %s", usernameOrEmail)));
+		return UserPrincipal.create(user);
+	}
+	*/
+    @Test
+    void test1() {
 
-    User user_prueba;
+        Role role = new Role(RoleName.ROLE_ADMIN);
 
-    @BeforeEach
-    void init_data(){
-        Role rol = new Role();
-        rol.setName(RoleName.ROLE_ADMIN);
+        List<Role> listaRoles = Arrays.asList(role);
 
-        user_prueba = new User("user","de prueba","username12","emailtest@gmail.com","qwerty");
-        user_prueba.setRoles(List.of(rol));
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("Damian Wayne");
+        user.setUsername("bestRobin");
+        user.setEmail("robin@gothammail.com");
+        user.setRoles(listaRoles);
+
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+
+        when(userRepository.findByUsernameOrEmail(any(),any())).thenReturn(java.util.Optional.of(user));
+
+        assertEquals(userPrincipal, customUserDetailsService.loadUserByUsername("bestRobin"));
+
+
     }
 
     @Test
-    void test_loadUserByUsernameSuccess(){
+    void exception() {
 
-        when(userRepository.save(user_prueba)).thenReturn(user_prueba);
-        when(userRepository.findByUsernameOrEmail("username12","emailtest@gmail.com")).thenReturn(Optional.of(user_prueba));
+        Role role = new Role(RoleName.ROLE_ADMIN);
 
-        assertEquals(UserPrincipal.create(user_prueba),customUserDetailsService.loadUserByUsername("emailtest@gmail.com"));
+        List<Role> listaRoles = Arrays.asList(role);
+
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("Damian Wayne");
+        user.setUsername("bestRobin");
+        user.setEmail("robin@gothammail.com");
+        user.setRoles(listaRoles);
+
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+
+        when(userRepository.findByUsernameOrEmail("batman","batman@gothammail.com")).thenReturn(java.util.Optional.of(user));
+
+        assertThrows(UsernameNotFoundException.class,()-> customUserDetailsService.loadUserByUsername("bestRobin"));
+
 
     }
+    /*
+	@Override
+	@Transactional
+	public UserDetails loadUserById(Long id) {
+		User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException(String.format("User not found with id: %s", id)));
+
+		return UserPrincipal.create(user);
+	}*/
+
+    @Test
+    void testasdredafs() {
+
+        Role role = new Role(RoleName.ROLE_ADMIN);
+
+        List<Role> listaRoles = Arrays.asList(role);
+
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("Damian Wayne");
+        user.setUsername("bestRobin");
+        user.setEmail("robin@gothammail.com");
+        user.setRoles(listaRoles);
+
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(user));
+
+        assertEquals(userPrincipal, customUserDetailsService.loadUserById(1L));
+
+
+    }
+    @Test
+    void testasdrdadsedafs() {
+
+        Role role = new Role(RoleName.ROLE_ADMIN);
+
+        List<Role> listaRoles = Arrays.asList(role);
+
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("Damian Wayne");
+        user.setUsername("bestRobin");
+        user.setEmail("robin@gothammail.com");
+        user.setRoles(listaRoles);
+
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+
+        when(userRepository.findById(14L)).thenReturn(java.util.Optional.of(user));
+
+        assertThrows(UsernameNotFoundException.class,()-> customUserDetailsService.loadUserById(1L));
+
+
+    }
+
+
 
 }
