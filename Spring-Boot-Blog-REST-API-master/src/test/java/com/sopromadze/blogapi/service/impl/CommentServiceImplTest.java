@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-
+//TODO Hecho por Alfonso Gallardo
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class CommentServiceImplTest {
@@ -87,6 +87,7 @@ class CommentServiceImplTest {
         pageable = PageRequest.of(1, 1, Sort.Direction.DESC, "createdAt");
 
         commentRequest = new CommentRequest();
+
         commentRequest.setBody("Lleva la tarar un vestido blanco lleno de cascabeles");
 
         userPrincipal = new UserPrincipal(1L,"Alfonso", "Gallardo", "Alfonsogr", "email@gmail.com", "1234", null);
@@ -140,7 +141,7 @@ class CommentServiceImplTest {
         assertAll(
                 ()->assertTrue(commentService.addComment(commentRequest,any(Long.class),userPrincipal).getName().equals(comment.getName())),
                 ()->assertTrue(commentService.addComment(commentRequest,any(Long.class),userPrincipal).getEmail().equals(comment.getEmail())),
-                ()->assertTrue(commentService.addComment(commentRequest,any(Long.class),userPrincipal).getUser().getUsername().equals(userPrincipal.getUsername())),
+                ()->assertTrue(commentService.addComment(commentRequest,any(Long.class),userPrincipal).getUser().getUsername().equals(user.getUsername())),
                 ()->assertTrue(commentService.addComment(commentRequest,any(Long.class),userPrincipal).getPost().getTitle().equals(post.getTitle()))
         );
     }

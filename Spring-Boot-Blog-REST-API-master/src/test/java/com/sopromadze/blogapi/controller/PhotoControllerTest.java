@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+//TODO Hecho por Alfonso Gallardo
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {SpringSecurityTestWebConfig.class})
 @AutoConfigureMockMvc
 class PhotoControllerTest {
@@ -96,6 +97,12 @@ class PhotoControllerTest {
     static ResponseBodyMatchers responseBodyMatches() {
         return new ResponseBodyMatchers();
     }
+
+    /*
+    Test: Obtener todas las fotos
+    Entrada: /api/photos
+    Salida: Devuelve un código
+     */
 
     @Test
     void test_getAllPhotos () throws Exception {
