@@ -2,14 +2,19 @@ package com.sopromadze.blogapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sopromadze.blogapi.config.SpringSecurityTestWebConfig;
+import com.sopromadze.blogapi.model.Album;
+import com.sopromadze.blogapi.model.Post;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.payload.UserIdentityAvailability;
 import com.sopromadze.blogapi.payload.UserProfile;
 import com.sopromadze.blogapi.payload.UserSummary;
 import com.sopromadze.blogapi.security.UserPrincipal;
+import com.sopromadze.blogapi.service.AlbumService;
 import com.sopromadze.blogapi.service.CommentService;
+import com.sopromadze.blogapi.service.PostService;
 import com.sopromadze.blogapi.service.UserService;
 import com.sopromadze.blogapi.utils.AppUtils;
 import lombok.extern.java.Log;
@@ -50,6 +55,12 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private PostService postService;
+
+    @MockBean
+    private AlbumService albumService;
 
     @MockBean
     private AppUtils appUtils;
@@ -129,6 +140,50 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/{username}/profile",usuario_test.getUsername())
                         .contentType("application/json"))
                 .andExpect(content().json(objectMapper.writeValueAsString(userProfile)))
+                .andExpect(status().isOk()).andDo(print());
+    }
+
+    @Test
+    @DisplayName("GET /api/users/{username}/posts")
+    void test_getPostsCreatedBySuccess() throws Exception {
+
+        Post post_test = new Post();
+        post_test.setUser(usuario_test);
+        post_test.setCreatedBy(usuario_test.getId());
+
+        PagedResponse<Post> posts = new PagedResponse<Post>();
+        posts.setPage(1);
+        posts.setSize(1);
+        posts.setContent(List.of(post_test));
+
+        when(postService.getPostsByCreatedBy(usuario_test.getUsername(),1,1)).thenReturn(posts);
+        mockMvc.perform(get("/api/users/{username}/posts",usuario_test.getUsername())
+                        .param("page", "1")
+                        .param("size", "1")
+                        .contentType("application/json"))
+                .andExpect(content().json(objectMapper.writeValueAsString(posts)))
+                .andExpect(status().isOk()).andDo(print());
+    }
+
+    @Test
+    @DisplayName("GET /api/users/{username}/albums")
+    void test_getUserAlbumsSuccess() throws Exception {
+
+        Album album_test = new Album();
+        album_test.setUser(usuario_test);
+        album_test.setCreatedBy(usuario_test.getId());
+
+        PagedResponse<Album> albums = new PagedResponse<Album>();
+        albums.setPage(1);
+        albums.setSize(1);
+        albums.setContent(List.of(album_test));
+
+        when(albumService.getUserAlbums(usuario_test.getUsername(),1,1)).thenReturn(albums);
+        mockMvc.perform(get("/api/users/{username}/albums",usuario_test.getUsername())
+                        .param("page", "1")
+                        .param("size", "1")
+                        .contentType("application/json"))
+                .andExpect(content().json(objectMapper.writeValueAsString(albums)))
                 .andExpect(status().isOk()).andDo(print());
     }
 
