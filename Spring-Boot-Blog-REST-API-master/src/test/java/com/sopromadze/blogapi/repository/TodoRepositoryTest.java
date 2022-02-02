@@ -1,28 +1,32 @@
 package com.sopromadze.blogapi.repository;
 
+
+import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Todo;
 import com.sopromadze.blogapi.model.user.User;
-import org.junit.jupiter.api.BeforeEach;
+import org.hibernate.mapping.Any;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class TodoRepositoryTest {
+public class TodoRepositoryTest {
 
     @Autowired
     private TodoRepository todoRepository;
@@ -30,44 +34,31 @@ class TodoRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    User user;
-    Todo todo;
+    @Test
+    void test_NotNull(){ assertNotNull(todoRepository); }
 
-    @BeforeEach
-    void init() {
-        user = new User();
-        user.setEmail("user@email.com");
-        user.setFirstName("FirstName");
-        user.setUsername("UserName");
-        user.setLastName("LastName");
-        user.setPassword("password");
-        user.setCreatedAt(Instant.now());
-        user.setUpdatedAt(Instant.now());
+    @Test
+    void test_findByCreatedBySuccess(){
 
-        testEntityManager.persist(user);
+        User user_prueba = new User("user","de prueba","username12","emailtest@gmail.com","qwerty");
+        user_prueba.setCreatedAt(Instant.now());
+        user_prueba.setUpdatedAt(Instant.now());
 
-        todo= new Todo();
-        todo.setTitle("Todo");
-        todo.setCreatedAt(Instant.now());
+        testEntityManager.persist(user_prueba);
+
+        Todo todo = new Todo();
+        todo.setTitle("Título todo");
+        todo.setUser(user_prueba);
+        todo.setCreatedBy(user_prueba.getId());
+        todo.setUpdatedBy(user_prueba.getId());
         todo.setUpdatedAt(Instant.now());
-        todo.setUser(user);
-
+        todo.setCreatedAt(Instant.now());
 
         testEntityManager.persist(todo);
-    }
-    @Test
-    void test_NotNull(){
-        assertNotNull(todoRepository);
-    }
 
-    @Test
-    void test_todoRepository () {
-
-        Page<Todo> result = todoRepository.findByCreatedBy(1L, PageRequest.of(1,10));
-        assertTrue(result.getTotalElements()!=0);
-        //lenient().when(todoRepository.findByCreatedBy(user.getId(), pageRequest)).thenReturn(todos);
-        //assertNotEquals(0, todoRepository.findByCreatedBy(1L, pageRequest).getTotalElements());
+        assertEquals(List.of(todo), todoRepository.findByCreatedBy(user_prueba.getId(), any(PageRequest.class)).getContent());
 
     }
+    
 
 }

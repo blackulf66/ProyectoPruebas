@@ -113,6 +113,7 @@ public class AlbumServiceImpl implements AlbumService {
 		}
 		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);
 	}
+
 	@Override
 	public PagedResponse<Album> getUserAlbums(String username, int page, int size) {
 		User user = userRepository.getUserByName(username);
