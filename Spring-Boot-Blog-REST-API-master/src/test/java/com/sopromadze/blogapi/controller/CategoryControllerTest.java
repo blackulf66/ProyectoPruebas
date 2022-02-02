@@ -50,11 +50,14 @@ class CategoryControllerTest {
     @Test
     @WithUserDetails("admin")
     @DisplayName("GET api/categories/")
+    //TEST: devuelve todas las categorias que haya
+    //ENTRADA: get /api/categories
+    //RESULTADO ESPERADO: que devuelva un 200
     void test_getAll_Categories_Success() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
 
         pagedResponseCategories = new PagedResponse(List.of(category), 1, 1, 1, 1, true);
@@ -75,11 +78,14 @@ class CategoryControllerTest {
     @Test
     @DisplayName("POST api/categories/")
     @WithMockUser(authorities = {"ROLE_USER"})
+    //TEST: añade una categoria
+    //ENTRADA: post /api/categories
+    //RESULTADO ESPERADO: que devuelva un 200
     void test_addCategories_Success() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(post("/api/categories")
                 .content(objectMapper.writeValueAsString(category))
@@ -91,11 +97,15 @@ class CategoryControllerTest {
 
     @Test
     @DisplayName("POST api/categories/")
+    @WithMockUser(authorities = {"ROLE_OTRO"})
+    //TEST: añade una categoria
+    //ENTRADA: post /api/categories
+    //RESULTADO ESPERADO: que devuelva un 403
     void test_addCategories_Fail() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(post("/api/categories")
                         .content(objectMapper.writeValueAsString(category))
@@ -107,11 +117,15 @@ class CategoryControllerTest {
 
     @Test
     @DisplayName("GET api/categories/{id}")
+    @WithMockUser(authorities = {"ROLE_ADMIN"})
+    //TEST: obtiene las categorias por id
+    //ENTRADA: get /api/categories{id}
+    //RESULTADO ESPERADO: que devuelva un 200
     void test_get_Categories_ID_Success() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(get("/api/categories/{id}", 1L)
                         .content(objectMapper.writeValueAsString(category))
@@ -124,11 +138,14 @@ class CategoryControllerTest {
     @Test
     @DisplayName("PUT api/categories/{id}")
     @WithMockUser(authorities = {"ROLE_ADMIN"})
+    //TEST: obtiene las categorias por id
+    //ENTRADA: get /api/categories{id}
+    //RESULTADO ESPERADO: que devuelva un 200
     void test_put_Categories_Success() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(put("/api/categories/{id}", 1L)
                         .content(objectMapper.writeValueAsString(category))
@@ -139,11 +156,14 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Delete api/categories/{id}")
     @WithMockUser(authorities = {"ROLE_ADMIN" , "ROLE_USER"})
+        //TEST: que borre una categoria
+        //ENTRADA: delete /api/categories{id}
+        //RESULTADO ESPERADO: que devuelva un 204
     void test_Delete_Categories_Success() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(delete("/api/categories/{id}", 1L)
                         .content(objectMapper.writeValueAsString(category))
@@ -154,16 +174,20 @@ class CategoryControllerTest {
 
     @Test
     @DisplayName("Delete api/categories/{id}")
+    @WithMockUser(authorities = {"ROLE_OTRO"})
+        //TEST: que borre una categoria
+        //ENTRADA: delete /api/categories{id}
+        //RESULTADO ESPERADO: que devuelva un 403
     void test_Delete_Categories_fail() throws Exception {
 
         Category category = new Category();
         category.setId(1L);
-        category.setName("MIMIR CALLATE YA");
+        category.setName("KratosCategory");
 
         mockMvc.perform(delete("/api/categories/{id}", 1L)
                         .content(objectMapper.writeValueAsString(category))
                         .contentType("application/json"))
-                .andExpect(status().isNoContent()).andDo(print());
+                .andExpect(status().isForbidden()).andDo(print());
 
     }
 

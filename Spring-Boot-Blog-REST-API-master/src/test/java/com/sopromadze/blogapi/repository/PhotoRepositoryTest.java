@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -35,7 +36,7 @@ class PhotoRepositoryTest {
     void test_NotNull(){ assertNotNull(photoRepository);}
 
     @Test
-    void test_commentRepository_success() {
+    void test_PhotoRepository_success() {
 
         Album album = new Album();
         album.setTitle("album1");
@@ -59,34 +60,6 @@ class PhotoRepositoryTest {
         PageRequest pageRequest = PageRequest.of(1, 2);
 
         assertEquals(0, albumRepository.findByCreatedBy(album.getId(), pageRequest).getTotalElements());
-
-    }
-
-    @Test
-    void test_commentRepository_fail() {
-
-        Album album = new Album();
-        album.setTitle("album1");
-        album.setUpdatedAt(Instant.now());
-        album.setCreatedAt(Instant.now());
-
-
-        Photo photo = new Photo();
-        photo.setTitle("titulon");
-        photo.setAlbum(album);
-        photo.setThumbnailUrl("queurltanbonita");
-        photo.setUrl("QuieroMasFotosDeSpider-manDijoJJJ");
-        photo.setUpdatedAt(Instant.now());
-        photo.setCreatedAt(Instant.now());
-
-        testEntityManager.persist(album);
-
-        testEntityManager.persist(photo);
-
-        Page<Photo> comments = new PageImpl<>(Arrays.asList(photo));
-        PageRequest pageRequest = PageRequest.of(1, 2);
-
-        assertNotEquals(0, albumRepository.findByCreatedBy(album.getId(), pageRequest).getTotalElements());
 
     }
 
@@ -132,6 +105,14 @@ class PhotoRepositoryTest {
 
 
         assertEquals(3, photoRepository.findByAlbumId(album.getId(), pageable).getTotalElements());
+    }
+
+    @Test
+    void test_findAlbumEmpty(){
+
+        Pageable pageable = PageRequest.of(1, 3, Sort.Direction.DESC, AppConstants.CREATED_AT);
+
+        assertEquals(0, photoRepository.findByAlbumId(any(), pageable).getTotalElements());
     }
 
 

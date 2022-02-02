@@ -31,6 +31,9 @@ class CommentRepositoryTest {
     void test_NotNull(){ assertNotNull(commentRepository);}
 
     @Test
+        //TEST: test para comprobar que hay objetos en el repositorio
+        //ENTRADA:
+        //RESULTADO ESPERADO: devolver los elementos totales del repositorio
     void test_commentRepositorySuccess() {
 
         Post post = new Post();
@@ -57,30 +60,8 @@ class CommentRepositoryTest {
     }
 
     @Test
-    void test_commentRepositoryFail() {
-
-        Post post = new Post();
-        post.setBody("sdfsadsad");
-        post.setUpdatedAt(Instant.now());
-        post.setCreatedAt(Instant.now());
-
-
-        testEntityManager.persist(post);
-
-        Comment comment = new Comment();
-        comment.setName("felicia hardy");
-        comment.setEmail("elemail@gmail.com");
-        comment.setBody("dsfghjidfsoihusdfo");
-        comment.setUpdatedAt(Instant.now());
-        comment.setCreatedAt(Instant.now());
-        comment.setPost(post);
-
-        testEntityManager.persist(comment);
-
-        assertNotEquals(List.of(comment), commentRepository.findByPostId(post.getId(), any(PageRequest.class)).getContent());
-
-
-
+    void test_commentRepositoryEmpty() {
+        assertEquals(0, commentRepository.findByPostId(any(), any(PageRequest.class)).getSize());
     }
 
 }
