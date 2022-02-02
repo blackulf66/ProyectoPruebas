@@ -99,9 +99,9 @@ class PhotoControllerTest {
     }
 
     /*
-    Test: Obtener todas las fotos
-    Entrada: /api/photos
-    Salida: Devuelve un código
+    Test: Comprobar si obtenemos todas las fotos
+    Entrada: Get /api/photos
+    Salida esperada: El test devuelve un código de estado 200, con la lista correspondiente
      */
 
     @Test
@@ -116,6 +116,11 @@ class PhotoControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    /*
+    Test: Comprobar si obtenemos una foto, dependiendo del id
+    Entrada: Get /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 200, con la foto correspondiente
+     */
     @Test
     void test_getPhoto () throws Exception {
         mockMvc.perform(get("/api/photos/{id}", 1L)
@@ -124,6 +129,11 @@ class PhotoControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    /*
+    Test: Comprobar si añadimos una nueva foto
+    Entrada: Post /api/photos
+    Salida esperada: El test devuelve un código de estado 200, con la foto nueva
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_USER"})
     void test_addPhoto () throws Exception {
@@ -133,6 +143,11 @@ class PhotoControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    /*
+    Test: Comprobar si al añadir una nueva foto, nos da el error esperado
+    Entrada: Post /api/photos
+    Salida esperada: El test devuelve un código de estado 400 Bad Request
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_USER"})
     void test_addPhoto_return400 () throws Exception {
@@ -141,6 +156,11 @@ class PhotoControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /*
+    Test: Comprobar si al añadir una nueva foto, nos da el error esperado
+    Entrada: Post /api/photos
+    Salida esperada: El test devuelve un código de estado 403 Forbidden
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_ADMIN"})
     void test_addPhoto_return403() throws Exception {
@@ -150,6 +170,11 @@ class PhotoControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /*
+    Test: Comprobar si podemos editar una foto
+    Entrada: Put /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 200, con la foto editada
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_USER", "ROLE_ADMIN"})
     void test_updatePhoto ()throws Exception {
@@ -159,6 +184,11 @@ class PhotoControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    /*
+    Test: Comprobar si al editar una nueva foto, nos da el error esperado
+    Entrada: Put /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 400 Bad Request
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_USER", "ROLE_ADMIN"})
     void test_updatePhoto_return400() throws Exception {
@@ -167,6 +197,11 @@ class PhotoControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /*
+    Test: Comprobar si al editar una nueva foto, nos da el error esperado
+    Entrada: Put /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 403 Forbidden
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_OTRO"})
     void test_updatePhoto_return403() throws Exception {
@@ -176,6 +211,11 @@ class PhotoControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /*
+    Test: Comprobar si podemos borrar una foto por su id
+    Entrada: Delete /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 200
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_ADMIN", "ROLE_USER"})
     void test_deletePhoto () throws Exception {
@@ -185,6 +225,11 @@ class PhotoControllerTest {
                 .andExpect(status().isOk()).andDo(print());
     }
 
+    /*
+    Test: Comprobar si al borrar una nueva foto, nos da el error esperado
+    Entrada: Delete /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 403 Forbidden
+     */
     @Test
     @WithMockUser(authorities = {"ROLE_OTRO"})
     void test_deletePhoto_return403() throws Exception {
@@ -194,6 +239,11 @@ class PhotoControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /*
+    Test: Comprobar si al borrar una nueva foto, nos da el error esperado
+    Entrada: Delete /api/photos/{id}
+    Salida esperada: El test devuelve un código de estado 401 Unauthorized
+     */
     @Test
     void test_deletePhoto_return401() throws Exception {
         mockMvc.perform(delete("/api/photo/{id}",1L)
