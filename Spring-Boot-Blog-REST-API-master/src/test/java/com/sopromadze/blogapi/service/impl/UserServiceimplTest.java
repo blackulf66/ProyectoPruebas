@@ -134,17 +134,6 @@ public class UserServiceimplTest {
 
 
 
-//        Long postCount = postRepository.countByCreatedBy(user.getId());
-//
-//        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(),
-//                user.getCreatedAt(), user.getEmail(), user.getAddress(), user.getPhone(), user.getWebsite(),
-//                user.getCompany(), postCount
-//);
-//
-//
-//        when(userRepository.getUserByName("rafaelito")).thenReturn(user);
-//        assertEquals(userProfile, userService.getUserProfile(user.getUsername()));
-
 
 
     }
@@ -270,45 +259,10 @@ public class UserServiceimplTest {
 
     }
 
-    @Test
-    void shouldDeleteUser(){
 
-<<<<<<< HEAD
-        UserServiceImpl service = mock(UserServiceImpl.class);
-        UserPrincipal user_prueba = mock(UserPrincipal.class);
-
-        User userABorrar = new User();
-        userABorrar.setUsername("pepito");
-        userABorrar.setFirstName("pepe");
-        userABorrar.setId(1L);
-
-        when(userRepository.findByUsername("pepito")).thenReturn(Optional.of(userABorrar));
-
-        UserPrincipal userPrincipal = mock(UserPrincipal.class);
-
-        when(userService.deleteUser("manuelito", userPrincipal)).thenThrow(new ResourceNotFoundException("User", "id", "manuelito"));
-        assertThrows()
-=======
-
-        when(this.userRepository.findByUsername("albertito")).thenReturn(Optional.of(user));
-
-        userRepository.save(user);
-
-        assertTrue(this.userRepository.existsByUsername("albertito"));
-
-        when(this.userRepository.findByEmail("albertito@hotmail.com")).thenReturn(Optional.of(user));
-
-        userRepository.save(user);
-
-        assertTrue(this.userRepository.existsByUsername("albertito@hotmail.com"));
-
->>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
-
-
-    }
 
     @Test
-    void giveAdminTestSuccess(){
+    void giveAdminTestExceptionSuccess(){
 
 
         Company company = new Company();
@@ -361,24 +315,11 @@ public class UserServiceimplTest {
 
 
 
-<<<<<<< HEAD
-=======
-//        assertTrue();
-//        lenient().when(usuario.getRoles()).thenReturn();
->>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
-
 
 
     }
 
-    @Test
-    void checkThis(){
-        String palabra = "ey que ase";
 
-        assertTrue(palabra.length() ==10);
-        if (palabra.length() ==10 )
-            System.out.println("es verdadero");
-    }
 
 
 
