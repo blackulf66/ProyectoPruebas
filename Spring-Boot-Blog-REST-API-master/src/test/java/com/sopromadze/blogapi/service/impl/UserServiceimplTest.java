@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -171,7 +172,7 @@ public class UserServiceimplTest {
     }
 
     @Test
-    void giveAdminTestSuccess(){
+    void giveAdminTestSuccessThrowAppException(){
 
 
         Address address = new Address();
@@ -194,6 +195,7 @@ public class UserServiceimplTest {
 
 
         User usuario = new User();
+        usuario.setId(1L);
         usuario.setFirstName("manuel");
         usuario.setUsername("manspitub");
         usuario.setLastName("spinola");
@@ -206,26 +208,86 @@ public class UserServiceimplTest {
         roles.add(roleAdmin);
         roles.add(roleUser);
 
+        User userWithoutRole = new User();
+        userWithoutRole.setId(2L);
+        userWithoutRole.setFirstName("manuel");
+        userWithoutRole.setUsername("manuelitoo");
+        userWithoutRole.setLastName("spinola");
+        userWithoutRole.setEmail("manspitub@@hotmail.com");
+        userWithoutRole.setAddress(address);
+        userWithoutRole.setCompany(company);
+        userWithoutRole.setPhone("459403477");
+
+        userRepository.save(userWithoutRole);
+
+        assertThrows(AppException.class, ()-> service.giveAdmin("manuelitoo"));
 
 
-        User savedUser = userRepository.save(usuario);
 
-        usuario.setRoles(roles);
 
-//        assertTrue();
-//        lenient().when(usuario.getRoles()).thenReturn();
+
+
+
+
+
+
+
+
+
+
 
 
 
     }
 
     @Test
-    void checkThis(){
-        String palabra = "ey que ase";
+    void removeAdminFromUserTest(){
+        Address address = new Address();
+        address.setCity("Sevilla");
+        address.setStreet("Calle Condes de Bustillo");
+        Company company = new Company();
+        company.setName("MacDonald");
 
-        assertTrue(palabra.length() ==10);
-        if (palabra.length() ==10 )
-            System.out.println("es verdadero");
+
+
+        List<Role> roles = new ArrayList<>();
+
+        Role roleUser = new Role();
+        roleUser.setName(RoleName.ROLE_USER);
+        Role roleAdmin = new Role();
+        roleAdmin.setName(RoleName.ROLE_ADMIN);
+        List<Role> rolesUser = new ArrayList<>();
+
+        roles.add(roleAdmin);
+
+
+        User usuario = new User();
+        usuario.setId(1L);
+        usuario.setFirstName("manuel");
+        usuario.setUsername("manspitub");
+        usuario.setLastName("spinola");
+        usuario.setEmail("manspitub@@hotmail.com");
+        usuario.setAddress(address);
+        usuario.setCompany(company);
+        usuario.setPhone("459403477");
+        usuario.setRoles(roles);
+
+        roles.add(roleAdmin);
+        roles.add(roleUser);
+
+        Role roleAdmin1 = new Role();
+
+        roleAdmin1.setName(RoleName.ROLE_ADMIN);
+
+
+
+
+        userRepository.save(usuario);
+
+        service.removeAdmin("manspitub");
+
+        assertFalse(usuario.getRoles().contains(roleAdmin1));
+
     }
 
 
