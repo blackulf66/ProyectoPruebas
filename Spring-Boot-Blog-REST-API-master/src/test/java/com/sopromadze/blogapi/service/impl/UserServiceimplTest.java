@@ -1,11 +1,15 @@
 package com.sopromadze.blogapi.service.impl;
 
 import com.sopromadze.blogapi.exception.AppException;
+import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
+import com.sopromadze.blogapi.model.Post;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.Address;
 import com.sopromadze.blogapi.model.user.Company;
 import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.payload.ApiResponse;
 import com.sopromadze.blogapi.payload.UserProfile;
 import com.sopromadze.blogapi.repository.PostRepository;
 import com.sopromadze.blogapi.repository.RoleRepository;
@@ -25,11 +29,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.transaction.Transactional;
+
+import static org.apache.logging.log4j.ThreadContext.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
@@ -37,12 +45,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -52,7 +60,7 @@ import static org.mockito.Mockito.mock;
 public class UserServiceimplTest {
 
     @Mock
-    UserRepository userRepository;
+   private UserRepository userRepository;
 
     @Mock
     UserService userService;
@@ -94,6 +102,13 @@ public class UserServiceimplTest {
         address.setCity("Sevilla");
         address.setStreet("Calle Condes de Bustillo");
 
+        List<Post> posts = new ArrayList<>();
+        Post post = new Post();
+        post.setId(3L);
+        post.setTitle("Post");
+        post.setBody("Cuerpo");
+        posts.add(post);
+
 
 
         User user = new User();
@@ -106,20 +121,29 @@ public class UserServiceimplTest {
         user.setCreatedAt(Instant.now());
         user.setWebsite("salesianos.com");
         user.setEmail("rafalito@gmail.com");
+        user.setPosts(posts);
 
-        userRepository.save(user);
-
-
-        Long postCount = postRepository.countByCreatedBy(user.getId());
-
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(),
-                user.getCreatedAt(), user.getEmail(), user.getAddress(), user.getPhone(), user.getWebsite(),
-                user.getCompany(), postCount
-);
+        when(userRepository.getUserByName("rafael")).thenReturn(user);
+        assertEquals(user, userRepository.getUserByName("rafael"));
 
 
-        when(userRepository.getUserByName("rafaelito")).thenReturn(user);
-        assertEquals(userProfile, userService.getUserProfile(user.getUsername()));
+
+
+
+
+
+
+
+//        Long postCount = postRepository.countByCreatedBy(user.getId());
+//
+//        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(),
+//                user.getCreatedAt(), user.getEmail(), user.getAddress(), user.getPhone(), user.getWebsite(),
+//                user.getCompany(), postCount
+//);
+//
+//
+//        when(userRepository.getUserByName("rafaelito")).thenReturn(user);
+//        assertEquals(userProfile, userService.getUserProfile(user.getUsername()));
 
 
 
@@ -128,14 +152,22 @@ public class UserServiceimplTest {
     @Test
     void whenNewUser_success(){
 
+        Company company = new Company();
+        company.setName("MacDonald");
+        Address address = new Address();
+        address.setCity("Sevilla");
+        address.setStreet("Calle Condes de Bustillo");
 
+        List<Post> posts = new ArrayList<>();
+        Post post = new Post();
+        post.setId(3L);
+        post.setTitle("Post");
+        post.setBody("Cuerpo");
+        posts.add(post);
 
 
         Role role = new Role();
-        User user = new User();
-        user.setId((1L));
-        user.setUsername("albertito");
-        user.setEmail("albertito@hotmail.com");
+
 
         List <Role> roles = new ArrayList<>();
 
@@ -144,6 +176,90 @@ public class UserServiceimplTest {
 
 
 
+        User user = new User();
+        user.setId(8L);
+        user.setFirstName("rafael");
+        user.setUsername("rafalito");
+        user.setLastName("Perez");
+        user.setPhone("348936200");
+        user.setCompany(company);
+        user.setAddress(address);
+        user.setCreatedAt(Instant.now());
+        user.setWebsite("salesianos.com");
+        user.setEmail("rafalito@gmail.com");
+        user.setPosts(posts);
+        user.setRoles(roles);
+
+        when(userService.addUser(user)).thenReturn(user);
+        assertEquals(user, userService.addUser(user));
+
+
+    }
+
+    @Test
+    @Transactional
+    void shouldUpdateUser(){
+        Company company = new Company();
+        company.setName("MacDonald");
+        Address address = new Address();
+        address.setCity("Sevilla");
+        address.setStreet("Calle Condes de Bustillo");
+
+        List<Post> posts = new ArrayList<>();
+        Post post = new Post();
+        post.setId(3L);
+        post.setTitle("Post");
+        post.setBody("Cuerpo");
+        posts.add(post);
+
+
+        Role role = new Role();
+
+
+        List <Role> roles = new ArrayList<>();
+
+        role.setName(RoleName.ROLE_ADMIN);
+        role.setId(1L);
+        roles.add(role);
+
+        Role role1 = new Role();
+        List<Role> roles1 = new ArrayList<>();
+        role1.setName(RoleName.ROLE_USER);
+        role.setId(2L);
+        roles1.add(role1);
+
+
+
+        User user = new User();
+        user.setId(8L);
+        user.setFirstName("rafael");
+        user.setUsername("rafalito");
+        user.setLastName("Perez");
+        user.setPhone("348936200");
+        user.setCompany(company);
+        user.setAddress(address);
+        user.setCreatedAt(Instant.now());
+        user.setWebsite("salesianos.com");
+        user.setEmail("rafalito@gmail.com");
+        user.setPosts(posts);
+        user.setRoles(roles);
+
+        String oldFirstName = user.getFirstName();
+        String newFirstName = oldFirstName + "o";
+
+        user.setFirstName(newFirstName);
+
+        assertThat(user.getFirstName()).isEqualTo("rafaelo");
+
+        User userAdmin = new User();
+        userAdmin.setRoles(roles);
+
+        assertThat(userAdmin.getRoles().get(0).getName()).isEqualTo(RoleName.ROLE_ADMIN);
+
+        User anotherUser = new User();
+        anotherUser.setRoles(roles1);
+        anotherUser.setUsername("manolito");
+        UserPrincipal userPrueba = mock(UserPrincipal.class);
 
 
 
@@ -152,8 +268,27 @@ public class UserServiceimplTest {
 
 
 
+    }
 
+    @Test
+    void shouldDeleteUser(){
 
+<<<<<<< HEAD
+        UserServiceImpl service = mock(UserServiceImpl.class);
+        UserPrincipal user_prueba = mock(UserPrincipal.class);
+
+        User userABorrar = new User();
+        userABorrar.setUsername("pepito");
+        userABorrar.setFirstName("pepe");
+        userABorrar.setId(1L);
+
+        when(userRepository.findByUsername("pepito")).thenReturn(Optional.of(userABorrar));
+
+        UserPrincipal userPrincipal = mock(UserPrincipal.class);
+
+        when(userService.deleteUser("manuelito", userPrincipal)).thenThrow(new ResourceNotFoundException("User", "id", "manuelito"));
+        assertThrows()
+=======
 
         when(this.userRepository.findByUsername("albertito")).thenReturn(Optional.of(user));
 
@@ -167,127 +302,82 @@ public class UserServiceimplTest {
 
         assertTrue(this.userRepository.existsByUsername("albertito@hotmail.com"));
 
+>>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
 
 
     }
 
     @Test
-    void giveAdminTestSuccessThrowAppException(){
+    void giveAdminTestSuccess(){
 
 
+        Company company = new Company();
+        company.setName("MacDonald");
         Address address = new Address();
         address.setCity("Sevilla");
         address.setStreet("Calle Condes de Bustillo");
-        Company company = new Company();
-        company.setName("MacDonald");
+
+        List<Post> posts = new ArrayList<>();
+        Post post = new Post();
+        post.setId(3L);
+        post.setTitle("Post");
+        post.setBody("Cuerpo");
+        posts.add(post);
+
+
+        Role role = new Role();
+
+
+        List <Role> roles = new ArrayList<>();
+
+        role.setName(RoleName.ROLE_ADMIN);
+        role.setId(1L);
+        roles.add(role);
+
+        Role role1 = new Role();
+        List<Role> roles1 = new ArrayList<>();
+        role1.setName(RoleName.ROLE_USER);
+        role.setId(2L);
+        roles1.add(role1);
 
 
 
-        List<Role> roles = new ArrayList<>();
+        User user = new User();
+        user.setId(8L);
+        user.setFirstName("rafael");
+        user.setUsername("rafalito");
+        user.setLastName("Perez");
+        user.setPhone("348936200");
+        user.setCompany(company);
+        user.setAddress(address);
+        user.setCreatedAt(Instant.now());
+        user.setWebsite("salesianos.com");
+        user.setEmail("rafalito@gmail.com");
+        user.setPosts(posts);
+        user.setRoles(roles);
 
-        Role roleUser = new Role();
-        roleUser.setName(RoleName.ROLE_USER);
-        Role roleAdmin = new Role();
-        roleAdmin.setName(RoleName.ROLE_ADMIN);
-        List<Role> rolesUser = new ArrayList<>();
 
-        rolesUser.add(roleUser);
-
-
-        User usuario = new User();
-        usuario.setId(1L);
-        usuario.setFirstName("manuel");
-        usuario.setUsername("manspitub");
-        usuario.setLastName("spinola");
-        usuario.setEmail("manspitub@@hotmail.com");
-        usuario.setAddress(address);
-        usuario.setCompany(company);
-        usuario.setPhone("459403477");
-        usuario.setRoles(rolesUser);
-
-        roles.add(roleAdmin);
-        roles.add(roleUser);
-
-        User userWithoutRole = new User();
-        userWithoutRole.setId(2L);
-        userWithoutRole.setFirstName("manuel");
-        userWithoutRole.setUsername("manuelitoo");
-        userWithoutRole.setLastName("spinola");
-        userWithoutRole.setEmail("manspitub@@hotmail.com");
-        userWithoutRole.setAddress(address);
-        userWithoutRole.setCompany(company);
-        userWithoutRole.setPhone("459403477");
-
-        userRepository.save(userWithoutRole);
-
-        assertThrows(AppException.class, ()-> service.giveAdmin("manuelitoo"));
+        
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+<<<<<<< HEAD
+=======
+//        assertTrue();
+//        lenient().when(usuario.getRoles()).thenReturn();
+>>>>>>> 8160c2d57290120cac04aeb80fd2c247a3c6106a
 
 
 
     }
 
     @Test
-    void removeAdminFromUserTest(){
-        Address address = new Address();
-        address.setCity("Sevilla");
-        address.setStreet("Calle Condes de Bustillo");
-        Company company = new Company();
-        company.setName("MacDonald");
+    void checkThis(){
+        String palabra = "ey que ase";
 
-
-
-        List<Role> roles = new ArrayList<>();
-
-        Role roleUser = new Role();
-        roleUser.setName(RoleName.ROLE_USER);
-        Role roleAdmin = new Role();
-        roleAdmin.setName(RoleName.ROLE_ADMIN);
-        List<Role> rolesUser = new ArrayList<>();
-
-        roles.add(roleAdmin);
-
-
-        User usuario = new User();
-        usuario.setId(1L);
-        usuario.setFirstName("manuel");
-        usuario.setUsername("manspitub");
-        usuario.setLastName("spinola");
-        usuario.setEmail("manspitub@@hotmail.com");
-        usuario.setAddress(address);
-        usuario.setCompany(company);
-        usuario.setPhone("459403477");
-        usuario.setRoles(roles);
-
-        roles.add(roleAdmin);
-        roles.add(roleUser);
-
-        Role roleAdmin1 = new Role();
-
-        roleAdmin1.setName(RoleName.ROLE_ADMIN);
-
-
-
-
-        userRepository.save(usuario);
-
-        service.removeAdmin("manspitub");
-
-        assertFalse(usuario.getRoles().contains(roleAdmin1));
-
+        assertTrue(palabra.length() ==10);
+        if (palabra.length() ==10 )
+            System.out.println("es verdadero");
     }
 
 
