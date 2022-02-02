@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+//TODO Hecho por Alfonso Gallardo
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PhotoServiceImplTest {
@@ -193,7 +194,7 @@ public class PhotoServiceImplTest {
 
         Photo photo = new Photo();
         photo.setId(1L);
-        photo.setTitle("Foto");
+        photo.setTitle("Foto de la playa");
         photo.setAlbum(album);
 
 
@@ -202,8 +203,12 @@ public class PhotoServiceImplTest {
        when(albumRepository.findById(any(Long.class))).thenReturn(Optional.of(album));
        when(photoRepository.findById(any(Long.class))).thenReturn(Optional.of(photo));
        when(photoRepository.save(photo)).thenReturn(photo);
-       assertEquals(photoResponse, photoService.addPhoto(photoRequest,userPrincipal));
-
+       assertAll(
+               ()-> assertEquals(photoResponse.getTitle() , photo.getTitle()) ,
+               ()-> assertEquals(photoResponse.getUrl() , photo.getUrl()) ,
+               ()-> assertEquals(photoResponse.getThumbnailUrl() , photo.getThumbnailUrl()) ,
+               ()-> assertEquals(photoResponse.getAlbumId() , photo.getAlbum().getId())
+       );
     }
 
     @Test
