@@ -7,6 +7,13 @@ import com.sopromadze.blogapi.repository.AlbumRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.UserService;
+
+import com.sopromadze.blogapi.model.role.Role;
+import com.sopromadze.blogapi.model.role.RoleName;
+import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.repository.UserRepository;
+import com.sopromadze.blogapi.security.UserPrincipal;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

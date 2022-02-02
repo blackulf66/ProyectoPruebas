@@ -29,41 +29,33 @@ class AlbumRepositoryTestU {
     private TestEntityManager testEntityManager;
 
     @Test
+        //TEST: test de repositorio no nulo
+        //ENTRADA: assertNotNull(albumRepository)
+        //RESULTADO ESPERADO: que devuelva not null
     void test_NotNull(){ assertNotNull(albumRepository);}
-    /*
-    * @Repository
-public interface AlbumRepository extends JpaRepository<Album, Long> {
-	Page<Album> findByCreatedBy(Long userId, Pageable pageable);
-}
-*/
+
     @Test
+        //TEST: test para comprobar que hay objetos en el repositorio
+        //ENTRADA:
+        //RESULTADO ESPERADO: devolver los elementos totales del repositorio
     void test_albumRepository_success(){
 
         Album album = new Album();
         album.setTitle("flying grayson");
+        album.setCreatedBy(1L);
         album.setUpdatedAt(Instant.now());
         album.setCreatedAt(Instant.now());
 
         testEntityManager.persist(album);
 
-        User user = new User();
-        user.setFirstName("Dick");
-        user.setLastName("Grayson");
-        user.setUsername("The Robin");
-        user.setPassword("batmanisnotbrucewayne");
-        user.setEmail("therobin@gmail.com");
-        user.setUpdatedAt(Instant.now());
-        user.setCreatedAt(Instant.now());
-
-        testEntityManager.persist(user);
-
-
         Page<Album> albums = new PageImpl<>(Arrays.asList(album));
-        PageRequest pageRequest = PageRequest.of(1, 2);
+        PageRequest pageRequest = PageRequest.of(1, 1);
 
-        assertEquals(0, albumRepository.findByCreatedBy(album.getId(), pageRequest).getTotalElements());
+        assertEquals(1, albumRepository.findByCreatedBy(album.getCreatedBy(), pageRequest).getTotalElements());
 
     }
+
+
 
 
 }
