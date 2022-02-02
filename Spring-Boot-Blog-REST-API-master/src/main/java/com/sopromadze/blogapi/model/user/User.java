@@ -65,7 +65,7 @@ public class User extends DateAudit {
 	private String username;
 
 	@NotBlank
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Size(max = 100)
 	@Column(name = "password")
 	private String password;
